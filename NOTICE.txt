@@ -1,0 +1,12 @@
+Super Duo!
+Copyright 2015 Jesús Adolfo García Pasquel
+
+The original code was provided by Udacity.
+
+Some files in the configuration directory were originally created by
+Vincent Brison for his vb-android-app-quality project. The source files
+can be found at https://github.com/vincentbrison/vb-android-app-quality
+
+The XSLT file used to generate the HTML Checkstyle report,
+(checkstyle-noframes-sorted.xsl) was taken from:
+https://svn.apache.org/repos/asf/hive/trunk/checkstyle/

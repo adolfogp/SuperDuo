@@ -5,11 +5,24 @@ buildscript {
         jcenter()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:1.0.+'
+        classpath 'com.android.tools.build:gradle:1.3.0'
+        classpath "com.android.databinding:dataBinder:1.0-rc1"
+
+        // This dependency was added to avoid breaking lint with Retrolambda
+        // See: https://github.com/evant/android-retrolambda-lombok
+        //      and
+        //      https://github.com/evant/gradle-retrolambda/issues/96
+        classpath 'me.tatarka.retrolambda.projectlombok:lombok.ast:0.2.3.a2'
 
         // NOTE: Do not place your application dependencies here; they belong
         // in the individual module build.gradle files
     }
+
+    // This exclusion was added to avoid breaking lint with Retrolambda
+    // See: https://github.com/evant/android-retrolambda-lombok
+    //      and
+    //      https://github.com/evant/gradle-retrolambda/issues/96
+    configurations.classpath.exclude group: 'com.android.tools.external.lombok'
 }
 
 allprojects {
