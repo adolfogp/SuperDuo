@@ -45,6 +45,7 @@ The resulting APK may be found at `app/build/outputs`.
 
 The applications use the following frameworks and libraries:
 
+* [ZXing Android Embedded](http://square.github.io/retrofit/) to scan barcodes.
 * [Data Binding Library]
   (https://developer.android.com/tools/data-binding/guide.html) to follow the
   Model-View-ViewModel pattern. More information can be found in the following
