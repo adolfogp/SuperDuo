@@ -10,6 +10,7 @@ import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.util.Patterns;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -21,6 +22,7 @@ import android.widget.Toast;
 
 
 import com.google.zxing.integration.android.IntentIntegrator;
+import com.google.zxing.integration.android.IntentResult;
 
 import it.jaschke.alexandria.data.AlexandriaContract;
 import it.jaschke.alexandria.services.BookService;
@@ -28,6 +30,12 @@ import it.jaschke.alexandria.services.DownloadImage;
 
 
 public class AddBook extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
+
+    /**
+     * Identifies the messages written to the log by this class.
+     */
+    private static final String LOG_TAG = AddBook.class.getSimpleName();
+
     private static final String TAG = "INTENT_TO_SCAN_ACTIVITY";
     private EditText ean;
     private final int LOADER_ID = 1;
@@ -99,7 +107,9 @@ public class AddBook extends Fragment implements LoaderManager.LoaderCallbacks<C
                 // Hint: Use a Try/Catch block to handle the Intent dispatch gracefully, if you
                 // are using an external app.
                 //when you're done, remove the toast below.
-                IntentIntegrator.forSupportFragment(AddBook.this).initiateScan();
+                IntentIntegrator.forSupportFragment(AddBook.this)
+                        .setDesiredBarcodeFormats(IntentIntegrator.ONE_D_CODE_TYPES)
+                        .initiateScan();
             }
         });
 
@@ -127,6 +137,18 @@ public class AddBook extends Fragment implements LoaderManager.LoaderCallbacks<C
         }
 
         return rootView;
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        IntentResult scanResult =
+                IntentIntegrator.parseActivityResult(requestCode, resultCode, data);
+        if (scanResult == null) {
+            Log.w(LOG_TAG, "No scanned barcode resuts received.");
+            return;
+        }
+        // TODO: Make sure the scanned value is valid (otherwise the app crashes).
+        ean.setText(scanResult.getContents());
     }
 
     private void restartLoader(){
