@@ -1,4 +1,4 @@
-package it.jaschke.alexandria;
+package it.jaschke.alexandria.view.fragment;
 
 import android.content.Intent;
 import android.database.Cursor;
@@ -18,21 +18,44 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import org.parceler.Parcels;
+
+import it.jaschke.alexandria.view.activity.MainActivity;
+import it.jaschke.alexandria.R;
 import it.jaschke.alexandria.data.AlexandriaContract;
-import it.jaschke.alexandria.services.BookService;
-import it.jaschke.alexandria.services.DownloadImage;
+import it.jaschke.alexandria.model.domain.Book;
+import it.jaschke.alexandria.service.BookService;
+import it.jaschke.alexandria.service.DownloadImage;
 
 
 public class BookDetail extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
 
-    public static final String EAN_KEY = "EAN";
+    /**
+     * Key used to access the {@link Book} specified as argument at creation
+     * time.
+     * @see #newInstance(Book)
+     */
+    private static final String ARG_BOOK = "EAN";
+
     private final int LOADER_ID = 10;
     private View rootView;
-    private String ean;
+    private String ean; // TODO: Use view and domain model instead of these variables.
     private String bookTitle;
     private ShareActionProvider shareActionProvider;
 
-    public BookDetail(){
+    /**
+     * Creates a new instance of {@link BookDetail} for the specified
+     * book. You must use this factory method to create new instances.
+     *
+     * @param book the {@link Book} for which the details will be displayed.
+     * @return A new instance of {@link BookDetail}.
+     */
+    public static BookDetail newInstance(Book book) {
+        Bundle args = new Bundle();
+        args.putParcelable(ARG_BOOK, Parcels.wrap(book));
+        BookDetail fragment = new BookDetail();
+        fragment.setArguments(args);
+        return fragment;
     }
 
     @Override
@@ -47,7 +70,9 @@ public class BookDetail extends Fragment implements LoaderManager.LoaderCallback
 
         Bundle arguments = getArguments();
         if (arguments != null) {
-            ean = arguments.getString(BookDetail.EAN_KEY);
+            // TODO: Use view and domain models
+            Book book = Parcels.unwrap(getArguments().getParcelable(ARG_BOOK));
+            ean = Long.toString(book.getId());
             getLoaderManager().restartLoader(LOADER_ID, null, this);
         }
 

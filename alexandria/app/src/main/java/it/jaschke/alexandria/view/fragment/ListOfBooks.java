@@ -1,4 +1,4 @@
-package it.jaschke.alexandria;
+package it.jaschke.alexandria.view.fragment;
 
 import android.app.Activity;
 import android.database.Cursor;
@@ -7,7 +7,6 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,8 +14,11 @@ import android.widget.AdapterView;
 import android.widget.EditText;
 import android.widget.ListView;
 
-import it.jaschke.alexandria.api.BookListAdapter;
-import it.jaschke.alexandria.api.Callback;
+import de.greenrobot.event.EventBus;
+import it.jaschke.alexandria.R;
+import it.jaschke.alexandria.model.domain.Book;
+import it.jaschke.alexandria.model.event.BookSelectionEvent;
+import it.jaschke.alexandria.view.adapter.BookListAdapter;
 import it.jaschke.alexandria.data.AlexandriaContract;
 
 
@@ -70,8 +72,11 @@ public class ListOfBooks extends Fragment implements LoaderManager.LoaderCallbac
             public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
                 Cursor cursor = bookListAdapter.getCursor();
                 if (cursor != null && cursor.moveToPosition(position)) {
-                    ((Callback)getActivity())
-                            .onItemSelected(cursor.getString(cursor.getColumnIndex(AlexandriaContract.BookEntry._ID)));
+                    Book selectedBook = new Book();
+                    // TODO: Remove usage of getColumnIndex
+                    selectedBook.setId(cursor.getLong(
+                            cursor.getColumnIndex(AlexandriaContract.BookEntry._ID)));
+                    EventBus.getDefault().post(new BookSelectionEvent(selectedBook));
                 }
             }
         });

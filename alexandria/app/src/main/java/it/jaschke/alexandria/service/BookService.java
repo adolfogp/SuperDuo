@@ -1,4 +1,4 @@
-package it.jaschke.alexandria.services;
+package it.jaschke.alexandria.service;
 
 import android.app.IntentService;
 import android.content.ContentValues;
@@ -19,7 +19,7 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
-import it.jaschke.alexandria.MainActivity;
+import it.jaschke.alexandria.view.activity.MainActivity;
 import it.jaschke.alexandria.R;
 import it.jaschke.alexandria.data.AlexandriaContract;
 

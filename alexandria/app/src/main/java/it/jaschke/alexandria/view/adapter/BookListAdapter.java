@@ -1,4 +1,4 @@
-package it.jaschke.alexandria.api;
+package it.jaschke.alexandria.view.adapter;
 
 
 import android.content.Context;
@@ -12,7 +12,7 @@ import android.widget.TextView;
 
 import it.jaschke.alexandria.R;
 import it.jaschke.alexandria.data.AlexandriaContract;
-import it.jaschke.alexandria.services.DownloadImage;
+import it.jaschke.alexandria.service.DownloadImage;
 
 /**
  * Created by saj on 11/01/15.

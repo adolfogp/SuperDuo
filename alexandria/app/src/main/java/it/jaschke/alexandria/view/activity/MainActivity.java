@@ -1,4 +1,4 @@
-package it.jaschke.alexandria;
+package it.jaschke.alexandria.view.activity;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -17,10 +17,17 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Toast;
 
-import it.jaschke.alexandria.api.Callback;
+import de.greenrobot.event.EventBus;
+import it.jaschke.alexandria.view.fragment.NavigationDrawerFragment;
+import it.jaschke.alexandria.R;
+import it.jaschke.alexandria.model.event.BookSelectionEvent;
+import it.jaschke.alexandria.view.fragment.About;
+import it.jaschke.alexandria.view.fragment.AddBook;
+import it.jaschke.alexandria.view.fragment.BookDetail;
+import it.jaschke.alexandria.view.fragment.ListOfBooks;
 
 
-public class MainActivity extends ActionBarActivity implements NavigationDrawerFragment.NavigationDrawerCallbacks, Callback {
+public class MainActivity extends ActionBarActivity implements NavigationDrawerFragment.NavigationDrawerCallbacks {
 
     /**
      * Fragment managing the behaviors, interactions and presentation of the navigation drawer.
@@ -57,7 +64,19 @@ public class MainActivity extends ActionBarActivity implements NavigationDrawerF
 
         // Set up the drawer.
         navigationDrawerFragment.setUp(R.id.navigation_drawer,
-                    (DrawerLayout) findViewById(R.id.drawer_layout));
+                (DrawerLayout) findViewById(R.id.drawer_layout));
+    }
+
+    @Override
+    public void onResume() {
+        EventBus.getDefault().register(this);
+        super.onResume();
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        EventBus.getDefault().unregister(this);
     }
 
     @Override
@@ -132,24 +151,22 @@ public class MainActivity extends ActionBarActivity implements NavigationDrawerF
         super.onDestroy();
     }
 
-    @Override
-    public void onItemSelected(String ean) {
-        Bundle args = new Bundle();
-        args.putString(BookDetail.EAN_KEY, ean);
-
-        BookDetail fragment = new BookDetail();
-        fragment.setArguments(args);
-
+    /**
+     * Displays the detail view of the selected movie.
+     *
+     * @param event the movie selection event.
+     */
+    public void onEvent(BookSelectionEvent event) {
         int id = R.id.container;
         if(findViewById(R.id.right_container) != null){
             id = R.id.right_container;
         }
         getSupportFragmentManager().beginTransaction()
-                .replace(id, fragment)
+                .replace(id, BookDetail.newInstance(event.getSelectedBook()))
                 .addToBackStack("Book Detail")
                 .commit();
-
     }
+
 
     private class MessageReciever extends BroadcastReceiver {
         @Override

@@ -1,4 +1,4 @@
-package it.jaschke.alexandria.services;
+package it.jaschke.alexandria.service;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
