@@ -19,10 +19,10 @@ import it.jaschke.alexandria.R;
 import it.jaschke.alexandria.model.domain.Book;
 import it.jaschke.alexandria.model.event.BookSelectionEvent;
 import it.jaschke.alexandria.view.adapter.BookListAdapter;
-import it.jaschke.alexandria.data.AlexandriaContract;
+import it.jaschke.alexandria.data.BookContract;
 
 
-public class ListOfBooks extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
+public class ListOfBooksFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
 
     private BookListAdapter bookListAdapter;
     private ListView bookList;
@@ -31,7 +31,7 @@ public class ListOfBooks extends Fragment implements LoaderManager.LoaderCallbac
 
     private final int LOADER_ID = 10;
 
-    public ListOfBooks() {
+    public ListOfBooksFragment() {
     }
 
     @Override
@@ -43,7 +43,7 @@ public class ListOfBooks extends Fragment implements LoaderManager.LoaderCallbac
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
         Cursor cursor = getActivity().getContentResolver().query(
-                AlexandriaContract.BookEntry.CONTENT_URI,
+                BookContract.BookEntry.CONTENT_URI,
                 null, // leaving "columns" null just returns all the columns.
                 null, // cols for "where" clause
                 null, // values for "where" clause
@@ -58,7 +58,7 @@ public class ListOfBooks extends Fragment implements LoaderManager.LoaderCallbac
                 new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        ListOfBooks.this.restartLoader();
+                        ListOfBooksFragment.this.restartLoader();
                     }
                 }
         );
@@ -75,7 +75,7 @@ public class ListOfBooks extends Fragment implements LoaderManager.LoaderCallbac
                     Book selectedBook = new Book();
                     // TODO: Remove usage of getColumnIndex
                     selectedBook.setId(cursor.getLong(
-                            cursor.getColumnIndex(AlexandriaContract.BookEntry._ID)));
+                            cursor.getColumnIndex(BookContract.BookEntry._ID)));
                     EventBus.getDefault().post(new BookSelectionEvent(selectedBook));
                 }
             }
@@ -91,14 +91,14 @@ public class ListOfBooks extends Fragment implements LoaderManager.LoaderCallbac
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
 
-        final String selection = AlexandriaContract.BookEntry.TITLE +" LIKE ? OR " + AlexandriaContract.BookEntry.SUBTITLE + " LIKE ? ";
+        final String selection = BookContract.BookEntry.TITLE +" LIKE ? OR " + BookContract.BookEntry.SUBTITLE + " LIKE ? ";
         String searchString =searchText.getText().toString();
 
         if(searchString.length()>0){
             searchString = "%"+searchString+"%";
             return new CursorLoader(
                     getActivity(),
-                    AlexandriaContract.BookEntry.CONTENT_URI,
+                    BookContract.BookEntry.CONTENT_URI,
                     null,
                     selection,
                     new String[]{searchString,searchString},
@@ -108,7 +108,7 @@ public class ListOfBooks extends Fragment implements LoaderManager.LoaderCallbac
 
         return new CursorLoader(
                 getActivity(),
-                AlexandriaContract.BookEntry.CONTENT_URI,
+                BookContract.BookEntry.CONTENT_URI,
                 null,
                 null,
                 null,

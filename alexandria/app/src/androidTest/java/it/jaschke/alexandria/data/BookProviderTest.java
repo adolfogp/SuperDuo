@@ -1,21 +1,16 @@
-package it.jaschke.alexandria;
+package it.jaschke.alexandria.data;
 
 import android.content.ContentUris;
 import android.content.ContentValues;
 import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 import android.test.AndroidTestCase;
-import android.util.Log;
-
-import it.jaschke.alexandria.data.AlexandriaContract;
-import it.jaschke.alexandria.data.DbHelper;
 
 /**
  * Created by saj on 23/12/14.
  */
-public class TestProvider extends AndroidTestCase {
-    public static final String LOG_TAG = TestProvider.class.getSimpleName();
+public class BookProviderTest extends AndroidTestCase {
+    public static final String LOG_TAG = BookProviderTest.class.getSimpleName();
 
     public void setUp() {
         deleteAllRecords();
@@ -23,24 +18,24 @@ public class TestProvider extends AndroidTestCase {
 
     public void deleteAllRecords() {
         mContext.getContentResolver().delete(
-                AlexandriaContract.BookEntry.CONTENT_URI,
+                BookContract.BookEntry.CONTENT_URI,
                 null,
                 null
         );
         mContext.getContentResolver().delete(
-                AlexandriaContract.CategoryEntry.CONTENT_URI,
+                BookContract.CategoryEntry.CONTENT_URI,
                 null,
                 null
         );
 
         mContext.getContentResolver().delete(
-                AlexandriaContract.AuthorEntry.CONTENT_URI,
+                BookContract.AuthorEntry.CONTENT_URI,
                 null,
                 null
         );
 
         Cursor cursor = mContext.getContentResolver().query(
-                AlexandriaContract.BookEntry.CONTENT_URI,
+                BookContract.BookEntry.CONTENT_URI,
                 null,
                 null,
                 null,
@@ -50,7 +45,7 @@ public class TestProvider extends AndroidTestCase {
         cursor.close();
 
         cursor = mContext.getContentResolver().query(
-                AlexandriaContract.AuthorEntry.CONTENT_URI,
+                BookContract.AuthorEntry.CONTENT_URI,
                 null,
                 null,
                 null,
@@ -60,7 +55,7 @@ public class TestProvider extends AndroidTestCase {
         cursor.close();
 
         cursor = mContext.getContentResolver().query(
-                AlexandriaContract.CategoryEntry.CONTENT_URI,
+                BookContract.CategoryEntry.CONTENT_URI,
                 null,
                 null,
                 null,
@@ -72,27 +67,27 @@ public class TestProvider extends AndroidTestCase {
 
     public void testGetType() {
 
-        String type = mContext.getContentResolver().getType(AlexandriaContract.BookEntry.CONTENT_URI);
-        assertEquals(AlexandriaContract.BookEntry.CONTENT_TYPE, type);
+        String type = mContext.getContentResolver().getType(BookContract.BookEntry.CONTENT_URI);
+        assertEquals(BookContract.BookEntry.CONTENT_TYPE, type);
 
-        type = mContext.getContentResolver().getType(AlexandriaContract.AuthorEntry.CONTENT_URI);
-        assertEquals(AlexandriaContract.AuthorEntry.CONTENT_TYPE, type);
+        type = mContext.getContentResolver().getType(BookContract.AuthorEntry.CONTENT_URI);
+        assertEquals(BookContract.AuthorEntry.CONTENT_TYPE, type);
 
-        type = mContext.getContentResolver().getType(AlexandriaContract.CategoryEntry.CONTENT_URI);
-        assertEquals(AlexandriaContract.CategoryEntry.CONTENT_TYPE, type);
+        type = mContext.getContentResolver().getType(BookContract.CategoryEntry.CONTENT_URI);
+        assertEquals(BookContract.CategoryEntry.CONTENT_TYPE, type);
 
         long id = 9780137903955L;
-        type = mContext.getContentResolver().getType(AlexandriaContract.BookEntry.buildBookUri(id));
-        assertEquals(AlexandriaContract.BookEntry.CONTENT_ITEM_TYPE, type);
+        type = mContext.getContentResolver().getType(BookContract.BookEntry.buildBookUri(id));
+        assertEquals(BookContract.BookEntry.CONTENT_ITEM_TYPE, type);
 
-        type = mContext.getContentResolver().getType(AlexandriaContract.BookEntry.buildFullBookUri(id));
-        assertEquals(AlexandriaContract.BookEntry.CONTENT_ITEM_TYPE, type);
+        type = mContext.getContentResolver().getType(BookContract.BookEntry.buildFullBookUri(id));
+        assertEquals(BookContract.BookEntry.CONTENT_ITEM_TYPE, type);
 
-        type = mContext.getContentResolver().getType(AlexandriaContract.AuthorEntry.buildAuthorUri(id));
-        assertEquals(AlexandriaContract.AuthorEntry.CONTENT_ITEM_TYPE, type);
+        type = mContext.getContentResolver().getType(BookContract.AuthorEntry.buildAuthorUri(id));
+        assertEquals(BookContract.AuthorEntry.CONTENT_ITEM_TYPE, type);
 
-        type = mContext.getContentResolver().getType(AlexandriaContract.CategoryEntry.buildCategoryUri(id));
-        assertEquals(AlexandriaContract.CategoryEntry.CONTENT_ITEM_TYPE, type);
+        type = mContext.getContentResolver().getType(BookContract.CategoryEntry.buildCategoryUri(id));
+        assertEquals(BookContract.CategoryEntry.CONTENT_ITEM_TYPE, type);
 
     }
 
@@ -107,118 +102,118 @@ public class TestProvider extends AndroidTestCase {
     }
 
     public void insertReadBook(){
-        ContentValues bookValues = TestDb.getBookValues();
+        ContentValues bookValues = BookDbTest.getBookValues();
 
-        Uri bookUri = mContext.getContentResolver().insert(AlexandriaContract.BookEntry.CONTENT_URI, bookValues);
+        Uri bookUri = mContext.getContentResolver().insert(BookContract.BookEntry.CONTENT_URI, bookValues);
         long bookRowId = ContentUris.parseId(bookUri);
         assertTrue(bookRowId != -1);
 
         Cursor cursor = mContext.getContentResolver().query(
-                AlexandriaContract.BookEntry.CONTENT_URI,
+                BookContract.BookEntry.CONTENT_URI,
                 null, // leaving "columns" null just returns all the columns.
                 null, // cols for "where" clause
                 null, // values for "where" clause
                 null  // sort order
         );
 
-        TestDb.validateCursor(cursor, bookValues);
+        BookDbTest.validateCursor(cursor, bookValues);
 
         cursor = mContext.getContentResolver().query(
-                AlexandriaContract.BookEntry.buildBookUri(bookRowId),
+                BookContract.BookEntry.buildBookUri(bookRowId),
                 null, // leaving "columns" null just returns all the columns.
                 null, // cols for "where" clause
                 null, // values for "where" clause
                 null  // sort order
         );
 
-        TestDb.validateCursor(cursor, bookValues);
+        BookDbTest.validateCursor(cursor, bookValues);
 
     }
 
     public void insertReadAuthor(){
-        ContentValues authorValues = TestDb.getAuthorValues();
+        ContentValues authorValues = BookDbTest.getAuthorValues();
 
-        Uri authorUri = mContext.getContentResolver().insert(AlexandriaContract.AuthorEntry.CONTENT_URI, authorValues);
+        Uri authorUri = mContext.getContentResolver().insert(BookContract.AuthorEntry.CONTENT_URI, authorValues);
         long authorRowId = ContentUris.parseId(authorUri);
         assertTrue(authorRowId != -1);
-        assertEquals(authorRowId,TestDb.ean);
+        assertEquals(authorRowId, BookDbTest.ean);
 
         Cursor cursor = mContext.getContentResolver().query(
-                AlexandriaContract.AuthorEntry.CONTENT_URI,
+                BookContract.AuthorEntry.CONTENT_URI,
                 null, // leaving "columns" null just returns all the columns.
                 null, // cols for "where" clause
                 null, // values for "where" clause
                 null  // sort order
         );
 
-        TestDb.validateCursor(cursor, authorValues);
+        BookDbTest.validateCursor(cursor, authorValues);
 
         cursor = mContext.getContentResolver().query(
-                AlexandriaContract.AuthorEntry.buildAuthorUri(authorRowId),
+                BookContract.AuthorEntry.buildAuthorUri(authorRowId),
                 null, // leaving "columns" null just returns all the columns.
                 null, // cols for "where" clause
                 null, // values for "where" clause
                 null  // sort order
         );
 
-        TestDb.validateCursor(cursor, authorValues);
+        BookDbTest.validateCursor(cursor, authorValues);
 
     }
 
     public void insertReadCategory(){
-        ContentValues categoryValues = TestDb.getCategoryValues();
+        ContentValues categoryValues = BookDbTest.getCategoryValues();
 
-        Uri categoryUri = mContext.getContentResolver().insert(AlexandriaContract.CategoryEntry.CONTENT_URI, categoryValues);
+        Uri categoryUri = mContext.getContentResolver().insert(BookContract.CategoryEntry.CONTENT_URI, categoryValues);
         long categoryRowId = ContentUris.parseId(categoryUri);
         assertTrue(categoryRowId != -1);
-        assertEquals(categoryRowId,TestDb.ean);
+        assertEquals(categoryRowId, BookDbTest.ean);
 
         Cursor cursor = mContext.getContentResolver().query(
-                AlexandriaContract.CategoryEntry.CONTENT_URI,
+                BookContract.CategoryEntry.CONTENT_URI,
                 null, // projection
                 null, // selection
                 null, // selection args
                 null  // sort order
         );
 
-        TestDb.validateCursor(cursor, categoryValues);
+        BookDbTest.validateCursor(cursor, categoryValues);
 
         cursor = mContext.getContentResolver().query(
-                AlexandriaContract.CategoryEntry.buildCategoryUri(categoryRowId),
+                BookContract.CategoryEntry.buildCategoryUri(categoryRowId),
                 null, // projection
                 null, // selection
                 null, // selection args
                 null  // sort order
         );
 
-        TestDb.validateCursor(cursor, categoryValues);
+        BookDbTest.validateCursor(cursor, categoryValues);
 
     }
 
     public void readFullBook(){
 
         Cursor cursor = mContext.getContentResolver().query(
-                AlexandriaContract.BookEntry.buildFullBookUri(TestDb.ean),
+                BookContract.BookEntry.buildFullBookUri(BookDbTest.ean),
                 null, // projection
                 null, // selection
                 null, // selection args
                 null  // sort order
         );
 
-         TestDb.validateCursor(cursor, TestDb.getFullDetailValues());
+         BookDbTest.validateCursor(cursor, BookDbTest.getFullDetailValues());
     }
 
     public void readFullList(){
 
         Cursor cursor = mContext.getContentResolver().query(
-                AlexandriaContract.BookEntry.FULL_CONTENT_URI,
+                BookContract.BookEntry.FULL_CONTENT_URI,
                 null, // projection
                 null, // selection
                 null, // selection args
                 null  // sort order
         );
 
-        TestDb.validateCursor(cursor, TestDb.getFullListValues());
+        BookDbTest.validateCursor(cursor, BookDbTest.getFullListValues());
     }
 
 

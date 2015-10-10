@@ -18,17 +18,18 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.squareup.picasso.Picasso;
+
 import org.parceler.Parcels;
 
 import it.jaschke.alexandria.view.activity.MainActivity;
 import it.jaschke.alexandria.R;
-import it.jaschke.alexandria.data.AlexandriaContract;
+import it.jaschke.alexandria.data.BookContract;
 import it.jaschke.alexandria.model.domain.Book;
 import it.jaschke.alexandria.service.BookService;
-import it.jaschke.alexandria.service.DownloadImage;
 
 
-public class BookDetail extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
+public class BookDetailFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
 
     /**
      * Key used to access the {@link Book} specified as argument at creation
@@ -44,16 +45,16 @@ public class BookDetail extends Fragment implements LoaderManager.LoaderCallback
     private ShareActionProvider shareActionProvider;
 
     /**
-     * Creates a new instance of {@link BookDetail} for the specified
+     * Creates a new instance of {@link BookDetailFragment} for the specified
      * book. You must use this factory method to create new instances.
      *
      * @param book the {@link Book} for which the details will be displayed.
-     * @return A new instance of {@link BookDetail}.
+     * @return A new instance of {@link BookDetailFragment}.
      */
-    public static BookDetail newInstance(Book book) {
+    public static BookDetailFragment newInstance(Book book) {
         Bundle args = new Bundle();
         args.putParcelable(ARG_BOOK, Parcels.wrap(book));
-        BookDetail fragment = new BookDetail();
+        BookDetailFragment fragment = new BookDetailFragment();
         fragment.setArguments(args);
         return fragment;
     }
@@ -103,7 +104,7 @@ public class BookDetail extends Fragment implements LoaderManager.LoaderCallback
     public android.support.v4.content.Loader<Cursor> onCreateLoader(int id, Bundle args) {
         return new CursorLoader(
                 getActivity(),
-                AlexandriaContract.BookEntry.buildFullBookUri(Long.parseLong(ean)),
+                BookContract.BookEntry.buildFullBookUri(Long.parseLong(ean)),
                 null,
                 null,
                 null,
@@ -117,7 +118,7 @@ public class BookDetail extends Fragment implements LoaderManager.LoaderCallback
             return;
         }
 
-        bookTitle = data.getString(data.getColumnIndex(AlexandriaContract.BookEntry.TITLE));
+        bookTitle = data.getString(data.getColumnIndex(BookContract.BookEntry.TITLE));
         ((TextView) rootView.findViewById(R.id.fullBookTitle)).setText(bookTitle);
 
         Intent shareIntent = new Intent(Intent.ACTION_SEND);
@@ -126,23 +127,27 @@ public class BookDetail extends Fragment implements LoaderManager.LoaderCallback
         shareIntent.putExtra(Intent.EXTRA_TEXT, getString(R.string.share_text)+bookTitle);
         shareActionProvider.setShareIntent(shareIntent);
 
-        String bookSubTitle = data.getString(data.getColumnIndex(AlexandriaContract.BookEntry.SUBTITLE));
+        String bookSubTitle = data.getString(data.getColumnIndex(BookContract.BookEntry.SUBTITLE));
         ((TextView) rootView.findViewById(R.id.fullBookSubTitle)).setText(bookSubTitle);
 
-        String desc = data.getString(data.getColumnIndex(AlexandriaContract.BookEntry.DESC));
+        String desc = data.getString(data.getColumnIndex(BookContract.BookEntry.DESC));
         ((TextView) rootView.findViewById(R.id.fullBookDesc)).setText(desc);
 
-        String authors = data.getString(data.getColumnIndex(AlexandriaContract.AuthorEntry.AUTHOR));
+        String authors = data.getString(data.getColumnIndex(BookContract.AuthorEntry.AUTHOR));
         String[] authorsArr = authors.split(",");
         ((TextView) rootView.findViewById(R.id.authors)).setLines(authorsArr.length);
         ((TextView) rootView.findViewById(R.id.authors)).setText(authors.replace(",","\n"));
-        String imgUrl = data.getString(data.getColumnIndex(AlexandriaContract.BookEntry.IMAGE_URL));
+        String imgUrl = data.getString(data.getColumnIndex(BookContract.BookEntry.IMAGE_URL));
         if(Patterns.WEB_URL.matcher(imgUrl).matches()){
-            new DownloadImage((ImageView) rootView.findViewById(R.id.fullBookCover)).execute(imgUrl);
-            rootView.findViewById(R.id.fullBookCover).setVisibility(View.VISIBLE);
+            ImageView fullBookCoverImageView =
+                    (ImageView) rootView.findViewById(R.id.fullBookCover);
+            Picasso.with(fullBookCoverImageView.getContext())
+                    .load(imgUrl)
+                    .into(fullBookCoverImageView);
+            fullBookCoverImageView.setVisibility(View.VISIBLE);
         }
 
-        String categories = data.getString(data.getColumnIndex(AlexandriaContract.CategoryEntry.CATEGORY));
+        String categories = data.getString(data.getColumnIndex(BookContract.CategoryEntry.CATEGORY));
         ((TextView) rootView.findViewById(R.id.categories)).setText(categories);
 
         if(rootView.findViewById(R.id.right_container)!=null){

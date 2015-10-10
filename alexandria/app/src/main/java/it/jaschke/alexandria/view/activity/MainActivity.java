@@ -21,10 +21,10 @@ import de.greenrobot.event.EventBus;
 import it.jaschke.alexandria.view.fragment.NavigationDrawerFragment;
 import it.jaschke.alexandria.R;
 import it.jaschke.alexandria.model.event.BookSelectionEvent;
-import it.jaschke.alexandria.view.fragment.About;
-import it.jaschke.alexandria.view.fragment.AddBook;
-import it.jaschke.alexandria.view.fragment.BookDetail;
-import it.jaschke.alexandria.view.fragment.ListOfBooks;
+import it.jaschke.alexandria.view.fragment.AboutFragment;
+import it.jaschke.alexandria.view.fragment.AddBookFragment;
+import it.jaschke.alexandria.view.fragment.BookDetailFragment;
+import it.jaschke.alexandria.view.fragment.ListOfBooksFragment;
 
 
 public class MainActivity extends ActionBarActivity implements NavigationDrawerFragment.NavigationDrawerCallbacks {
@@ -88,13 +88,13 @@ public class MainActivity extends ActionBarActivity implements NavigationDrawerF
         switch (position){
             default:
             case 0:
-                nextFragment = new ListOfBooks();
+                nextFragment = new ListOfBooksFragment();
                 break;
             case 1:
-                nextFragment = new AddBook();
+                nextFragment = new AddBookFragment();
                 break;
             case 2:
-                nextFragment = new About();
+                nextFragment = new AboutFragment();
                 break;
 
         }
@@ -162,7 +162,7 @@ public class MainActivity extends ActionBarActivity implements NavigationDrawerF
             id = R.id.right_container;
         }
         getSupportFragmentManager().beginTransaction()
-                .replace(id, BookDetail.newInstance(event.getSelectedBook()))
+                .replace(id, BookDetailFragment.newInstance(event.getSelectedBook()))
                 .addToBackStack("Book Detail")
                 .commit();
     }

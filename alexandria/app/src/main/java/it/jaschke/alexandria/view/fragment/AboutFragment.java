@@ -10,9 +10,9 @@ import android.view.ViewGroup;
 import it.jaschke.alexandria.R;
 
 
-public class About extends Fragment {
+public class AboutFragment extends Fragment {
 
-    public About(){
+    public AboutFragment(){
 
     }
 

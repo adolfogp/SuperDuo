@@ -17,11 +17,11 @@
 package it.jaschke.alexandria.model.event;
 
 import it.jaschke.alexandria.model.domain.Book;
-import it.jaschke.alexandria.view.fragment.ListOfBooks;
+import it.jaschke.alexandria.view.fragment.ListOfBooksFragment;
 
 /**
  * Event that occurs when a book is selected. For example, from a list of
- * books, like the one handled by {@link ListOfBooks}.
+ * books, like the one handled by {@link ListOfBooksFragment}.
  *
  * @author Jesús Adolfo García Pasquel
  */

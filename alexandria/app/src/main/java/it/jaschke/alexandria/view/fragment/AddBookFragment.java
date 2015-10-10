@@ -21,19 +21,19 @@ import android.widget.TextView;
 
 import com.google.zxing.integration.android.IntentIntegrator;
 import com.google.zxing.integration.android.IntentResult;
+import com.squareup.picasso.Picasso;
 
 import it.jaschke.alexandria.R;
-import it.jaschke.alexandria.data.AlexandriaContract;
+import it.jaschke.alexandria.data.BookContract;
 import it.jaschke.alexandria.service.BookService;
-import it.jaschke.alexandria.service.DownloadImage;
 
 
-public class AddBook extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
+public class AddBookFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
 
     /**
      * Identifies the messages written to the log by this class.
      */
-    private static final String LOG_TAG = AddBook.class.getSimpleName();
+    private static final String LOG_TAG = AddBookFragment.class.getSimpleName();
 
     private static final String TAG = "INTENT_TO_SCAN_ACTIVITY";
     private EditText ean;
@@ -48,7 +48,7 @@ public class AddBook extends Fragment implements LoaderManager.LoaderCallbacks<C
 
 
 
-    public AddBook(){
+    public AddBookFragment(){
     }
 
     @Override
@@ -92,7 +92,7 @@ public class AddBook extends Fragment implements LoaderManager.LoaderCallbacks<C
                 bookIntent.putExtra(BookService.EAN, ean);
                 bookIntent.setAction(BookService.FETCH_BOOK);
                 getActivity().startService(bookIntent);
-                AddBook.this.restartLoader();
+                AddBookFragment.this.restartLoader();
             }
         });
 
@@ -106,7 +106,7 @@ public class AddBook extends Fragment implements LoaderManager.LoaderCallbacks<C
                 // Hint: Use a Try/Catch block to handle the Intent dispatch gracefully, if you
                 // are using an external app.
                 //when you're done, remove the toast below.
-                IntentIntegrator.forSupportFragment(AddBook.this)
+                IntentIntegrator.forSupportFragment(AddBookFragment.this)
                         .setDesiredBarcodeFormats(IntentIntegrator.ONE_D_CODE_TYPES)
                         .initiateScan();
             }
@@ -165,7 +165,7 @@ public class AddBook extends Fragment implements LoaderManager.LoaderCallbacks<C
         }
         return new CursorLoader(
                 getActivity(),
-                AlexandriaContract.BookEntry.buildFullBookUri(Long.parseLong(eanStr)),
+                BookContract.BookEntry.buildFullBookUri(Long.parseLong(eanStr)),
                 null,
                 null,
                 null,
@@ -179,23 +179,27 @@ public class AddBook extends Fragment implements LoaderManager.LoaderCallbacks<C
             return;
         }
 
-        String bookTitle = data.getString(data.getColumnIndex(AlexandriaContract.BookEntry.TITLE));
+        String bookTitle = data.getString(data.getColumnIndex(BookContract.BookEntry.TITLE));
         ((TextView) rootView.findViewById(R.id.bookTitle)).setText(bookTitle);
 
-        String bookSubTitle = data.getString(data.getColumnIndex(AlexandriaContract.BookEntry.SUBTITLE));
+        String bookSubTitle = data.getString(data.getColumnIndex(BookContract.BookEntry.SUBTITLE));
         ((TextView) rootView.findViewById(R.id.bookSubTitle)).setText(bookSubTitle);
 
-        String authors = data.getString(data.getColumnIndex(AlexandriaContract.AuthorEntry.AUTHOR));
+        String authors = data.getString(data.getColumnIndex(BookContract.AuthorEntry.AUTHOR));
         String[] authorsArr = authors.split(",");
         ((TextView) rootView.findViewById(R.id.authors)).setLines(authorsArr.length);
         ((TextView) rootView.findViewById(R.id.authors)).setText(authors.replace(",","\n"));
-        String imgUrl = data.getString(data.getColumnIndex(AlexandriaContract.BookEntry.IMAGE_URL));
+        String imgUrl = data.getString(data.getColumnIndex(BookContract.BookEntry.IMAGE_URL));
+        // TODO: Use Data Binding
+        ImageView bookCoverImageView = (ImageView) rootView.findViewById(R.id.bookCover);
         if(Patterns.WEB_URL.matcher(imgUrl).matches()){
-            new DownloadImage((ImageView) rootView.findViewById(R.id.bookCover)).execute(imgUrl);
-            rootView.findViewById(R.id.bookCover).setVisibility(View.VISIBLE);
+            Picasso.with(bookCoverImageView.getContext())
+                    .load(imgUrl)
+                    .into(bookCoverImageView);
+            bookCoverImageView.setVisibility(View.VISIBLE);
         }
 
-        String categories = data.getString(data.getColumnIndex(AlexandriaContract.CategoryEntry.CATEGORY));
+        String categories = data.getString(data.getColumnIndex(BookContract.CategoryEntry.CATEGORY));
         ((TextView) rootView.findViewById(R.id.categories)).setText(categories);
 
         rootView.findViewById(R.id.save_button).setVisibility(View.VISIBLE);
