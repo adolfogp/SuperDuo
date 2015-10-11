@@ -91,7 +91,7 @@ public class ListOfBooksFragment extends Fragment implements LoaderManager.Loade
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
 
-        final String selection = BookContract.BookEntry.TITLE +" LIKE ? OR " + BookContract.BookEntry.SUBTITLE + " LIKE ? ";
+        final String selection = BookContract.BookEntry.COLUMN_TITLE +" LIKE ? OR " + BookContract.BookEntry.COLUMN_SUBTITLE + " LIKE ? ";
         String searchString =searchText.getText().toString();
 
         if(searchString.length()>0){

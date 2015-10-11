@@ -36,7 +36,7 @@ public class BookDetailFragment extends Fragment implements LoaderManager.Loader
      * time.
      * @see #newInstance(Book)
      */
-    private static final String ARG_BOOK = "EAN";
+    private static final String ARG_BOOK = "EXTRA_BOOK";
 
     private final int LOADER_ID = 10;
     private View rootView;
@@ -81,8 +81,11 @@ public class BookDetailFragment extends Fragment implements LoaderManager.Loader
         rootView.findViewById(R.id.delete_button).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                Book book = new Book();
+                book.setId(Long.parseLong(ean));
                 Intent bookIntent = new Intent(getActivity(), BookService.class);
-                bookIntent.putExtra(BookService.EAN, ean);
+                bookIntent.putExtra(BookService.EXTRA_BOOK
+                        , Parcels.wrap(book));
                 bookIntent.setAction(BookService.DELETE_BOOK);
                 getActivity().startService(bookIntent);
                 getActivity().getSupportFragmentManager().popBackStack();
@@ -118,7 +121,7 @@ public class BookDetailFragment extends Fragment implements LoaderManager.Loader
             return;
         }
 
-        bookTitle = data.getString(data.getColumnIndex(BookContract.BookEntry.TITLE));
+        bookTitle = data.getString(data.getColumnIndex(BookContract.BookEntry.COLUMN_TITLE));
         ((TextView) rootView.findViewById(R.id.fullBookTitle)).setText(bookTitle);
 
         Intent shareIntent = new Intent(Intent.ACTION_SEND);
@@ -127,17 +130,17 @@ public class BookDetailFragment extends Fragment implements LoaderManager.Loader
         shareIntent.putExtra(Intent.EXTRA_TEXT, getString(R.string.share_text)+bookTitle);
         shareActionProvider.setShareIntent(shareIntent);
 
-        String bookSubTitle = data.getString(data.getColumnIndex(BookContract.BookEntry.SUBTITLE));
+        String bookSubTitle = data.getString(data.getColumnIndex(BookContract.BookEntry.COLUMN_SUBTITLE));
         ((TextView) rootView.findViewById(R.id.fullBookSubTitle)).setText(bookSubTitle);
 
-        String desc = data.getString(data.getColumnIndex(BookContract.BookEntry.DESC));
+        String desc = data.getString(data.getColumnIndex(BookContract.BookEntry.COLUMN_DESCRIPTION));
         ((TextView) rootView.findViewById(R.id.fullBookDesc)).setText(desc);
 
         String authors = data.getString(data.getColumnIndex(BookContract.AuthorEntry.AUTHOR));
         String[] authorsArr = authors.split(",");
         ((TextView) rootView.findViewById(R.id.authors)).setLines(authorsArr.length);
         ((TextView) rootView.findViewById(R.id.authors)).setText(authors.replace(",","\n"));
-        String imgUrl = data.getString(data.getColumnIndex(BookContract.BookEntry.IMAGE_URL));
+        String imgUrl = data.getString(data.getColumnIndex(BookContract.BookEntry.COLUMN_COVER_IMAGE_URL));
         if(Patterns.WEB_URL.matcher(imgUrl).matches()){
             ImageView fullBookCoverImageView =
                     (ImageView) rootView.findViewById(R.id.fullBookCover);
@@ -147,7 +150,7 @@ public class BookDetailFragment extends Fragment implements LoaderManager.Loader
             fullBookCoverImageView.setVisibility(View.VISIBLE);
         }
 
-        String categories = data.getString(data.getColumnIndex(BookContract.CategoryEntry.CATEGORY));
+        String categories = data.getString(data.getColumnIndex(BookContract.CategoryEntry.COLUMN_NAME));
         ((TextView) rootView.findViewById(R.id.categories)).setText(categories);
 
         if(rootView.findViewById(R.id.right_container)!=null){

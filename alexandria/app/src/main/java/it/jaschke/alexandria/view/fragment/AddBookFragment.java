@@ -23,8 +23,11 @@ import com.google.zxing.integration.android.IntentIntegrator;
 import com.google.zxing.integration.android.IntentResult;
 import com.squareup.picasso.Picasso;
 
+import org.parceler.Parcels;
+
 import it.jaschke.alexandria.R;
 import it.jaschke.alexandria.data.BookContract;
+import it.jaschke.alexandria.model.domain.Book;
 import it.jaschke.alexandria.service.BookService;
 
 
@@ -88,8 +91,11 @@ public class AddBookFragment extends Fragment implements LoaderManager.LoaderCal
                     return;
                 }
                 //Once we have an ISBN, start a book intent
+                Book book = new Book();
+                book.setId(Long.parseLong(ean));
                 Intent bookIntent = new Intent(getActivity(), BookService.class);
-                bookIntent.putExtra(BookService.EAN, ean);
+                bookIntent.putExtra(BookService.EXTRA_BOOK
+                        , Parcels.wrap(book));
                 bookIntent.setAction(BookService.FETCH_BOOK);
                 getActivity().startService(bookIntent);
                 AddBookFragment.this.restartLoader();
@@ -122,8 +128,11 @@ public class AddBookFragment extends Fragment implements LoaderManager.LoaderCal
         rootView.findViewById(R.id.delete_button).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                Book book = new Book();
+                book.setId(Long.parseLong(ean.getText().toString())); // TODO: Handle exception
                 Intent bookIntent = new Intent(getActivity(), BookService.class);
-                bookIntent.putExtra(BookService.EAN, ean.getText().toString());
+                bookIntent.putExtra(BookService.EXTRA_BOOK
+                        , Parcels.wrap(book));
                 bookIntent.setAction(BookService.DELETE_BOOK);
                 getActivity().startService(bookIntent);
                 ean.setText("");
@@ -165,7 +174,7 @@ public class AddBookFragment extends Fragment implements LoaderManager.LoaderCal
         }
         return new CursorLoader(
                 getActivity(),
-                BookContract.BookEntry.buildFullBookUri(Long.parseLong(eanStr)),
+                BookContract.BookEntry.buildFullBookUri(Long.parseLong(eanStr)), // TODO: Handle exception
                 null,
                 null,
                 null,
@@ -179,17 +188,17 @@ public class AddBookFragment extends Fragment implements LoaderManager.LoaderCal
             return;
         }
 
-        String bookTitle = data.getString(data.getColumnIndex(BookContract.BookEntry.TITLE));
+        String bookTitle = data.getString(data.getColumnIndex(BookContract.BookEntry.COLUMN_TITLE));
         ((TextView) rootView.findViewById(R.id.bookTitle)).setText(bookTitle);
 
-        String bookSubTitle = data.getString(data.getColumnIndex(BookContract.BookEntry.SUBTITLE));
+        String bookSubTitle = data.getString(data.getColumnIndex(BookContract.BookEntry.COLUMN_SUBTITLE));
         ((TextView) rootView.findViewById(R.id.bookSubTitle)).setText(bookSubTitle);
 
         String authors = data.getString(data.getColumnIndex(BookContract.AuthorEntry.AUTHOR));
         String[] authorsArr = authors.split(",");
         ((TextView) rootView.findViewById(R.id.authors)).setLines(authorsArr.length);
         ((TextView) rootView.findViewById(R.id.authors)).setText(authors.replace(",","\n"));
-        String imgUrl = data.getString(data.getColumnIndex(BookContract.BookEntry.IMAGE_URL));
+        String imgUrl = data.getString(data.getColumnIndex(BookContract.BookEntry.COLUMN_COVER_IMAGE_URL));
         // TODO: Use Data Binding
         ImageView bookCoverImageView = (ImageView) rootView.findViewById(R.id.bookCover);
         if(Patterns.WEB_URL.matcher(imgUrl).matches()){
@@ -199,7 +208,7 @@ public class AddBookFragment extends Fragment implements LoaderManager.LoaderCal
             bookCoverImageView.setVisibility(View.VISIBLE);
         }
 
-        String categories = data.getString(data.getColumnIndex(BookContract.CategoryEntry.CATEGORY));
+        String categories = data.getString(data.getColumnIndex(BookContract.CategoryEntry.COLUMN_NAME));
         ((TextView) rootView.findViewById(R.id.categories)).setText(categories);
 
         rootView.findViewById(R.id.save_button).setVisibility(View.VISIBLE);

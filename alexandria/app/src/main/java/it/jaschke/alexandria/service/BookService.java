@@ -11,6 +11,8 @@ import android.util.Log;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.parceler.Parcel;
+import org.parceler.Parcels;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -19,6 +21,7 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
+import it.jaschke.alexandria.model.domain.Book;
 import it.jaschke.alexandria.view.activity.MainActivity;
 import it.jaschke.alexandria.R;
 import it.jaschke.alexandria.data.BookContract;
@@ -27,70 +30,89 @@ import it.jaschke.alexandria.data.BookContract;
 /**
  * An {@link IntentService} subclass for handling asynchronous task requests in
  * a service on a separate handler thread.
- * <p/>
  */
 public class BookService extends IntentService {
 
+    /**
+     * Identifies messages written to the log by this class.
+     */
     private final String LOG_TAG = BookService.class.getSimpleName();
 
-    public static final String FETCH_BOOK = "it.jaschke.alexandria.services.action.FETCH_BOOK";
-    public static final String DELETE_BOOK = "it.jaschke.alexandria.services.action.DELETE_BOOK";
+    /**
+     * Identifies a request to fetch a book.
+     */
+    public static final String FETCH_BOOK =
+            "it.jaschke.alexandria.services.action.FETCH_BOOK";
 
-    public static final String EAN = "it.jaschke.alexandria.services.extra.EAN";
+    /**
+     * Identifies a request to delete a book.
+     */
+    public static final String DELETE_BOOK =
+            "it.jaschke.alexandria.services.action.DELETE_BOOK";
 
+    /**
+     * Extra included in the {@link Intent} to specify the {@link Book} to
+     * operate on (e.g. fetch or delete). The only required attribute is
+     * {@link Book#getId()}.
+     */
+    public static final String EXTRA_BOOK = "it.jaschke.alexandria.services.extra.Book";
+
+    /**
+     * Creates a new instance of {@link BookService}.
+     */
     public BookService() {
         super("Alexandria");
     }
 
     @Override
     protected void onHandleIntent(Intent intent) {
-        if (intent != null) {
-            final String action = intent.getAction();
-            if (FETCH_BOOK.equals(action)) {
-                final String ean = intent.getStringExtra(EAN);
-                fetchBook(ean);
-            } else if (DELETE_BOOK.equals(action)) {
-                final String ean = intent.getStringExtra(EAN);
-                deleteBook(ean);
-            }
+        Book book = Parcels.unwrap(intent.getParcelableExtra(EXTRA_BOOK));
+        final String action = intent.getAction();
+        if (FETCH_BOOK.equals(action)) {
+            fetchBook(book.getId());
+        } else if (DELETE_BOOK.equals(action)) {
+            deleteBook(book.getId());
         }
     }
 
     /**
-     * Handle action Foo in the provided background thread with the provided
-     * parameters.
+     * Deletes the book with the specified id from the {@code ContentProvider}.
+     *
+     * @param id the book's ISBN-13 number.
      */
-    private void deleteBook(String ean) {
-        if(ean!=null) {
-            getContentResolver().delete(BookContract.BookEntry.buildBookUri(Long.parseLong(ean)), null, null);
-        }
+    private void deleteBook(long id) {
+        getContentResolver().delete(BookContract.BookEntry.buildBookUri(id), null, null);
     }
 
     /**
-     * Handle action fetchBook in the provided background thread with the provided
-     * parameters.
+     * Downloads the information for the book with the specified ISBN-13 from
+     * a Google API.
+     *
+     * @param isbn the book's ISBN-13 number.
      */
-    private void fetchBook(String ean) {
-
-        if(ean.length()!=13){
+    private void fetchBook(long isbn) {
+        if(Long.toString(isbn).length() != 13) {
+            Log.w(LOG_TAG, "Not an ISBN-13. Ignoring " + isbn);
             return;
         }
 
         Cursor bookEntry = getContentResolver().query(
-                BookContract.BookEntry.buildBookUri(Long.parseLong(ean)),
+                BookContract.BookEntry.buildBookUri(isbn),
                 null, // leaving "columns" null just returns all the columns.
                 null, // cols for "where" clause
                 null, // values for "where" clause
                 null  // sort order
         );
 
-        if(bookEntry.getCount()>0){
+        // Do not fetch books already in the database.
+        if (bookEntry.getCount() > 0) {
             bookEntry.close();
             return;
         }
 
         bookEntry.close();
 
+        // TODO: Use Retrofit
         HttpURLConnection urlConnection = null;
         BufferedReader reader = null;
         String bookJsonString = null;
@@ -99,7 +121,7 @@ public class BookService extends IntentService {
             final String FORECAST_BASE_URL = "https://www.googleapis.com/books/v1/volumes?";
             final String QUERY_PARAM = "q";
 
-            final String ISBN_PARAM = "isbn:" + ean;
+            final String ISBN_PARAM = "isbn:" + isbn;
 
             Uri builtUri = Uri.parse(FORECAST_BASE_URL).buildUpon()
                     .appendQueryParameter(QUERY_PARAM, ISBN_PARAM)
@@ -187,13 +209,13 @@ public class BookService extends IntentService {
                 imgUrl = bookInfo.getJSONObject(IMG_URL_PATH).getString(IMG_URL);
             }
 
-            writeBackBook(ean, title, subtitle, desc, imgUrl);
+            writeBackBook(isbn, title, subtitle, desc, imgUrl);
 
             if(bookInfo.has(AUTHORS)) {
-                writeBackAuthors(ean, bookInfo.getJSONArray(AUTHORS));
+                writeBackAuthors(isbn, bookInfo.getJSONArray(AUTHORS));
             }
             if(bookInfo.has(CATEGORIES)){
-                writeBackCategories(ean,bookInfo.getJSONArray(CATEGORIES) );
+                writeBackCategories(isbn,bookInfo.getJSONArray(CATEGORIES) );
             }
 
         } catch (JSONException e) {
@@ -201,31 +223,31 @@ public class BookService extends IntentService {
         }
     }
 
-    private void writeBackBook(String ean, String title, String subtitle, String desc, String imgUrl) {
+    private void writeBackBook(long id, String title, String subtitle, String desc, String imgUrl) {
         ContentValues values= new ContentValues();
-        values.put(BookContract.BookEntry._ID, ean);
-        values.put(BookContract.BookEntry.TITLE, title);
-        values.put(BookContract.BookEntry.IMAGE_URL, imgUrl);
-        values.put(BookContract.BookEntry.SUBTITLE, subtitle);
-        values.put(BookContract.BookEntry.DESC, desc);
+        values.put(BookContract.BookEntry._ID, id);
+        values.put(BookContract.BookEntry.COLUMN_TITLE, title);
+        values.put(BookContract.BookEntry.COLUMN_COVER_IMAGE_URL, imgUrl);
+        values.put(BookContract.BookEntry.COLUMN_SUBTITLE, subtitle);
+        values.put(BookContract.BookEntry.COLUMN_DESCRIPTION, desc);
         getContentResolver().insert(BookContract.BookEntry.CONTENT_URI,values);
     }
 
-    private void writeBackAuthors(String ean, JSONArray jsonArray) throws JSONException {
+    private void writeBackAuthors(long id, JSONArray jsonArray) throws JSONException {
         ContentValues values= new ContentValues();
         for (int i = 0; i < jsonArray.length(); i++) {
-            values.put(BookContract.AuthorEntry._ID, ean);
+            values.put(BookContract.AuthorEntry._ID, id);
             values.put(BookContract.AuthorEntry.AUTHOR, jsonArray.getString(i));
             getContentResolver().insert(BookContract.AuthorEntry.CONTENT_URI, values);
             values= new ContentValues();
         }
     }
 
-    private void writeBackCategories(String ean, JSONArray jsonArray) throws JSONException {
+    private void writeBackCategories(long id, JSONArray jsonArray) throws JSONException {
         ContentValues values= new ContentValues();
         for (int i = 0; i < jsonArray.length(); i++) {
-            values.put(BookContract.CategoryEntry._ID, ean);
-            values.put(BookContract.CategoryEntry.CATEGORY, jsonArray.getString(i));
+            values.put(BookContract.CategoryEntry._ID, id);
+            values.put(BookContract.CategoryEntry.COLUMN_NAME, jsonArray.getString(i));
             getContentResolver().insert(BookContract.CategoryEntry.CONTENT_URI, values);
             values= new ContentValues();
         }

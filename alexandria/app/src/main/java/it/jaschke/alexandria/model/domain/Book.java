@@ -30,7 +30,7 @@ import org.parceler.Parcel;
 public class Book {
 
     /**
-     * The book's local identifier.
+     * The book's identifier.
      */
     private long mId;
 

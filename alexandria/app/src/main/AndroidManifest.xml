@@ -3,6 +3,7 @@
     package="it.jaschke.alexandria" >
 
     <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.CAMERA" />
     <uses-feature android:name="android.hardware.camera" />
     <uses-feature android:name="android.hardware.camera.autofocus" />
@@ -10,9 +11,10 @@
 
     <application
         android:allowBackup="true"
-        android:icon="@drawable/ic_launcher"
+        android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:theme="@style/AppTheme" >
+
         <activity
             android:name=".view.activity.MainActivity"
             android:configChanges="orientation"
@@ -30,9 +32,6 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".view.activity.MainActivity" />
         </activity>
-
-
-
         <provider
             android:name=".data.BookProvider"
             android:authorities="it.jaschke.alexandria"

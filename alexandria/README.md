@@ -8,3 +8,8 @@ as part of the third project assignment for [Udacity's Android Developer Nanodeg
 * Decoupled Fragment and Activity by removing callback communication and
   replacing it with EventBus.
 * Replaced task DownloadImage with the Picasso library.
+* Moved the app's icon from drawable to the mipmap folders to better support
+  scaling.
+* Added documentation for classes and packages.
+* Added domain model objects to improve the object oriented design of the
+  solution.
