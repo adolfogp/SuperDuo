@@ -9,6 +9,7 @@ List of features that may be added in future versions.
     - Football Scores can be displayed in a widget.
     - Football Scores app has content descriptions for all buttons.
     - Football Scores app supports layout mirroring.
+    - Both: Remove unused libraries.
 
 * Extras (implement at least two)
     - Alexandria’s barcode scanning functionality does not require the

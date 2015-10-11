@@ -13,3 +13,4 @@ as part of the third project assignment for [Udacity's Android Developer Nanodeg
 * Added documentation for classes and packages.
 * Added domain model objects to improve the object oriented design of the
   solution.
+* Broke up large methods into smaller ones.
