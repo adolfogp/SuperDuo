@@ -23,42 +23,81 @@ import java.net.MalformedURLException;
 import java.net.URL;
 
 import it.jaschke.alexandria.model.domain.Book;
-import it.jaschke.alexandria.view.activity.MainActivity;
-import it.jaschke.alexandria.R;
 import it.jaschke.alexandria.data.BookContract;
 
 import static it.jaschke.alexandria.data.BookContract.BookEntry;
 
 
 /**
- * An {@link IntentService} subclass for handling asynchronous task requests in
- * a service on a separate handler thread.
+ * An {@link IntentService} subclass that handles book data download, storage
+ * and deletion asynchronously. To request either action, use an {@link Intent}
+ * specifying {@link #ACTION_FETCH_BOOK} or {@link #ACTION_DELETE_BOOK} and
+ * the {@link Book} in {@link #EXTRA_BOOK}. This service notifies about
+ * empty results, download and processing errors by publishing {@link Intent}s
+ * with {@link #ACTION_NOTIFY} on the {@link LocalBroadcastManager}. The
+ * notifications have different categories.
+ *
+ * @author Sascha Jaschke
+ * @author Jesús Adolfo García Pasquel
  */
 public class BookService extends IntentService {
 
     /**
      * Identifies messages written to the log by this class.
      */
-    private final String LOG_TAG = BookService.class.getSimpleName();
+    private static final String LOG_TAG = BookService.class.getSimpleName();
 
     /**
-     * Identifies a request to fetch a book.
+     * Action specified to the service in {@link Intent}s that request that data
+     * for a book is retrieved from the RESTful service and stored in the
+     * {@code ContentProvider}. The intent must also provide {@link #EXTRA_BOOK}.
      */
-    public static final String FETCH_BOOK =
-            "it.jaschke.alexandria.services.action.FETCH_BOOK";
+    public static final String ACTION_FETCH_BOOK =
+            "it.jaschke.alexandria.services.action.ACTION_FETCH_BOOK";
 
     /**
-     * Identifies a request to delete a book.
+     * Action specified to the service in {@link Intent}s that request that data
+     * for a book is deleted from the {@code ContentProvider}. The intent must
+     * also provide {@link #EXTRA_BOOK}.
      */
-    public static final String DELETE_BOOK =
-            "it.jaschke.alexandria.services.action.DELETE_BOOK";
+    public static final String ACTION_DELETE_BOOK =
+            "it.jaschke.alexandria.services.action.ACTION_DELETE_BOOK";
 
     /**
      * Extra included in the {@link Intent} to specify the {@link Book} to
      * operate on (e.g. fetch or delete). The only required attribute is
-     * {@link Book#getId()}.
+     * {@link Book#getId()}, the book's ISBN-13.
      */
-    public static final String EXTRA_BOOK = "it.jaschke.alexandria.services.extra.Book";
+    public static final String EXTRA_BOOK =
+            "it.jaschke.alexandria.service.extra.Book";
+
+    /**
+     * Action specified by the service when broadcasting an {@link Intent} to
+     * notify about an event.
+     */
+    public static final String ACTION_NOTIFY =
+            "it.jaschke.alexandria.service.action.ACTION_NOTIFY";
+
+    /**
+     * Category used to notify that no results were found on the RESTful API for
+     * the requested book.
+     */
+    public static final String CATEGORY_NO_RESULT =
+            "it.jaschke.alexandria.service.category.CATEGORY_NO_RESULT";
+
+    /**
+     * Category used to notify that an error occurred while downloading
+     * results from the RESTful API for the requested book.
+     */
+    public static final String CATEGORY_DOWNLOAD_ERROR =
+            "it.jaschke.alexandria.service.category.CATEGORY_DOWNLOAD_ERROR";
+
+    /**
+     * Category used to notify that an error occurred while processing the
+     * retuls from the RESTful API for the requested book.
+     */
+    public static final String CATEGORY_RESULT_PROCESSING_ERROR =
+            "it.jaschke.alexandria.service.category.CATEGORY_RESULT_PROCESSING_ERROR";
 
     /**
      * Creates a new instance of {@link BookService}.
@@ -71,20 +110,23 @@ public class BookService extends IntentService {
     protected void onHandleIntent(Intent intent) {
         Book book = Parcels.unwrap(intent.getParcelableExtra(EXTRA_BOOK));
         final String action = intent.getAction();
-        if (FETCH_BOOK.equals(action)) {
-            fetchBook(book.getId());
-        } else if (DELETE_BOOK.equals(action)) {
-            deleteBook(book.getId());
+        if (ACTION_FETCH_BOOK.equals(action)) {
+            fetchBook(book);
+        } else if (ACTION_DELETE_BOOK.equals(action)) {
+            deleteBook(book);
         }
     }
 
     /**
      * Deletes the book with the specified id from the {@code ContentProvider}.
      *
-     * @param id the book's ISBN-13 number.
+     * @param book an instance of {@link Book} with its id set to the book's
+     *             ISBN-13 number.
      */
-    private void deleteBook(long id) {
-        getContentResolver().delete(BookContract.BookEntry.buildBookUri(id), null, null);
+    private void deleteBook(Book book) {
+        final long isbn = book.getId();
+        getContentResolver().delete(
+                BookContract.BookEntry.buildBookUri(isbn), null, null);
     }
 
     /**
@@ -111,11 +153,15 @@ public class BookService extends IntentService {
     /**
      * Downloads the information for the book with the specified ISBN-13 from
      * a Google API and inserts it into the {@code ContentProvider}, if not
-     * available already.
+     * available already. Posts notifications on the {@link LocalBroadcastManager}
+     * if no results are returned by the service, an error occurred while
+     * downloading the book's data or processing the result.
      *
-     * @param isbn the book's ISBN-13 number.
+     * @param book an instance of {@link Book} with its id set to the book's
+     *             ISBN-13 number.
      */
-    private void fetchBook(long isbn) {
+    private void fetchBook(Book book) {
+        final long isbn = book.getId();
         if(Long.toString(isbn).length() != 13) {
             Log.w(LOG_TAG, "Not an ISBN-13. Ignoring " + isbn);
             return;
@@ -125,9 +171,17 @@ public class BookService extends IntentService {
             return;
         }
 
-        String bookJsonString = downloadBookData(isbn);
+        String bookJsonString = null;
 
-        if (StringUtils.EMPTY.equals(bookJsonString)) {
+        try {
+            bookJsonString = downloadBookData(isbn);
+        } catch (IOException ioe) {
+            Log.e(LOG_TAG, "Unable to download book data.", ioe);
+            postNotification(CATEGORY_DOWNLOAD_ERROR, book);
+            return;
+        }
+        if (StringUtils.trimToNull(bookJsonString) == null) {
+            postNotification(CATEGORY_NO_RESULT, book);
             return;
         }
 
@@ -147,10 +201,7 @@ public class BookService extends IntentService {
             if(bookJson.has(ITEMS)){
                 bookArray = bookJson.getJSONArray(ITEMS);
             }else{
-                // TODO: Use EventBus instead of broadcast
-                Intent messageIntent = new Intent(MainActivity.MESSAGE_EVENT);
-                messageIntent.putExtra(MainActivity.MESSAGE_KEY,getResources().getString(R.string.not_found));
-                LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(messageIntent);
+                postNotification(CATEGORY_NO_RESULT, book);
                 return;
             }
 
@@ -185,7 +236,25 @@ public class BookService extends IntentService {
             }
         } catch (JSONException e) {
             Log.e(LOG_TAG, "Error processing JSON", e);
+            postNotification(CATEGORY_RESULT_PROCESSING_ERROR, book);
         }
+    }
+
+    /**
+     * Posts an {@link Intent} with {@link #ACTION_NOTIFY} and the specified
+     * category to the {@link LocalBroadcastManager}. The {@link Book} is
+     * added as an extra, associated to the key {@link #EXTRA_BOOK}.
+     *
+     * @param category the notification's category.
+     * @param book the book to add as an extra. May be {@code null}.
+     */
+    private void postNotification(String category, Book book) {
+        Intent notificationIntent = new Intent(ACTION_NOTIFY);
+        notificationIntent.addCategory(category);
+        if (book != null) {
+            notificationIntent.putExtra(EXTRA_BOOK, Parcels.wrap(book));
+        }
+        LocalBroadcastManager.getInstance(this).sendBroadcast(notificationIntent);
     }
 
     /**
@@ -194,9 +263,10 @@ public class BookService extends IntentService {
      *
      * @param isbn the book's ISBN-13.
      * @return the data for the specified book, downloaded from the Google API,
-     *     in JSON format.
+     *     in JSON format. May be null.
+     * @throws IOException if an error occurs while downloading the book's data.
      */
-    private String downloadBookData(long isbn) {
+    private String downloadBookData(long isbn) throws IOException {
         StringBuilder buffer = new StringBuilder();
         final String FORECAST_BASE_URL =
                 "https://www.googleapis.com/books/v1/volumes?";
@@ -205,14 +275,7 @@ public class BookService extends IntentService {
         Uri builtUri = Uri.parse(FORECAST_BASE_URL).buildUpon()
                 .appendQueryParameter(QUERY_PARAM, ISBN_PARAM)
                 .build();
-        URL url = null;
-        try {
-            url = new URL(builtUri.toString());
-        } catch (MalformedURLException e) {
-            Log.wtf(LOG_TAG, "The URI is not valid. " + builtUri.toString(), e);
-            return buffer.toString();
-        }
-
+        URL url = new URL(builtUri.toString());
         HttpURLConnection urlConnection = null;
         BufferedReader reader = null;
         try  {
@@ -221,7 +284,7 @@ public class BookService extends IntentService {
             urlConnection.connect();
             InputStream inputStream = urlConnection.getInputStream();
             if (inputStream == null) {
-                return buffer.toString();
+                return null;
             }
 
             reader = new BufferedReader(new InputStreamReader(inputStream));
@@ -230,8 +293,6 @@ public class BookService extends IntentService {
                 buffer.append(line);
                 buffer.append("\n");
             }
-        } catch (IOException e) {
-            Log.e(LOG_TAG, "Error downloading book data.", e);
         } finally {
             if (urlConnection != null) {
                 urlConnection.disconnect();

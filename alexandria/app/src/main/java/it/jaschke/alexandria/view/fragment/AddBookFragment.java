@@ -96,7 +96,7 @@ public class AddBookFragment extends Fragment implements LoaderManager.LoaderCal
                 Intent bookIntent = new Intent(getActivity(), BookService.class);
                 bookIntent.putExtra(BookService.EXTRA_BOOK
                         , Parcels.wrap(book));
-                bookIntent.setAction(BookService.FETCH_BOOK);
+                bookIntent.setAction(BookService.ACTION_FETCH_BOOK);
                 getActivity().startService(bookIntent);
                 AddBookFragment.this.restartLoader();
             }
@@ -133,7 +133,7 @@ public class AddBookFragment extends Fragment implements LoaderManager.LoaderCal
                 Intent bookIntent = new Intent(getActivity(), BookService.class);
                 bookIntent.putExtra(BookService.EXTRA_BOOK
                         , Parcels.wrap(book));
-                bookIntent.setAction(BookService.DELETE_BOOK);
+                bookIntent.setAction(BookService.ACTION_DELETE_BOOK);
                 getActivity().startService(bookIntent);
                 ean.setText("");
             }

@@ -86,7 +86,7 @@ public class BookDetailFragment extends Fragment implements LoaderManager.Loader
                 Intent bookIntent = new Intent(getActivity(), BookService.class);
                 bookIntent.putExtra(BookService.EXTRA_BOOK
                         , Parcels.wrap(book));
-                bookIntent.setAction(BookService.DELETE_BOOK);
+                bookIntent.setAction(BookService.ACTION_DELETE_BOOK);
                 getActivity().startService(bookIntent);
                 getActivity().getSupportFragmentManager().popBackStack();
             }

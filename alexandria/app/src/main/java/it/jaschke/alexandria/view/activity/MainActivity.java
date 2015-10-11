@@ -12,12 +12,14 @@ import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Toast;
 
 import de.greenrobot.event.EventBus;
+import it.jaschke.alexandria.service.BookService;
 import it.jaschke.alexandria.view.fragment.NavigationDrawerFragment;
 import it.jaschke.alexandria.R;
 import it.jaschke.alexandria.model.event.BookSelectionEvent;
@@ -30,6 +32,11 @@ import it.jaschke.alexandria.view.fragment.ListOfBooksFragment;
 public class MainActivity extends ActionBarActivity implements NavigationDrawerFragment.NavigationDrawerCallbacks {
 
     /**
+     * Identifies the messages written to the log by this class.
+     */
+    private static final String LOG_TAG = MainActivity.class.getSimpleName();
+
+    /**
      * Fragment managing the behaviors, interactions and presentation of the navigation drawer.
      */
     private NavigationDrawerFragment navigationDrawerFragment;
@@ -39,10 +46,11 @@ public class MainActivity extends ActionBarActivity implements NavigationDrawerF
      */
     private CharSequence title;
     public static boolean IS_TABLET = false;
-    private BroadcastReceiver messageReciever;
 
-    public static final String MESSAGE_EVENT = "MESSAGE_EVENT";
-    public static final String MESSAGE_KEY = "MESSAGE_EXTRA";
+    /**
+     * Receives notifications broadcasted by {@link BookService}.
+     */
+    private BroadcastReceiver mBookNotificationReceiver;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -53,10 +61,6 @@ public class MainActivity extends ActionBarActivity implements NavigationDrawerF
         }else {
             setContentView(R.layout.activity_main);
         }
-
-        messageReciever = new MessageReciever();
-        IntentFilter filter = new IntentFilter(MESSAGE_EVENT);
-        LocalBroadcastManager.getInstance(this).registerReceiver(messageReciever,filter);
 
         navigationDrawerFragment = (NavigationDrawerFragment)
                 getSupportFragmentManager().findFragmentById(R.id.navigation_drawer);
@@ -70,13 +74,30 @@ public class MainActivity extends ActionBarActivity implements NavigationDrawerF
     @Override
     public void onResume() {
         EventBus.getDefault().register(this);
+        registerNotificationReceiver();
         super.onResume();
     }
 
     @Override
     public void onPause() {
         super.onPause();
+        unregisterNotificationReceiver();
         EventBus.getDefault().unregister(this);
+    }
+
+    private void registerNotificationReceiver() {
+        mBookNotificationReceiver = new NotificationBroadcastReciever();
+        IntentFilter filter = new IntentFilter(BookService.ACTION_NOTIFY);
+        filter.addCategory(BookService.CATEGORY_NO_RESULT);
+        filter.addCategory(BookService.CATEGORY_DOWNLOAD_ERROR);
+        filter.addCategory(BookService.CATEGORY_RESULT_PROCESSING_ERROR);
+        LocalBroadcastManager.getInstance(this)
+                .registerReceiver(mBookNotificationReceiver, filter);
+    }
+
+    private void unregisterNotificationReceiver() {
+        LocalBroadcastManager.getInstance(this)
+                .unregisterReceiver(mBookNotificationReceiver);
     }
 
     @Override
@@ -145,12 +166,6 @@ public class MainActivity extends ActionBarActivity implements NavigationDrawerF
         return super.onOptionsItemSelected(item);
     }
 
-    @Override
-    protected void onDestroy() {
-        LocalBroadcastManager.getInstance(this).unregisterReceiver(messageReciever);
-        super.onDestroy();
-    }
-
     /**
      * Displays the detail view of the selected movie.
      *
@@ -161,20 +176,11 @@ public class MainActivity extends ActionBarActivity implements NavigationDrawerF
         if(findViewById(R.id.right_container) != null){
             id = R.id.right_container;
         }
+        // TODO: Stop adding these operations to the backstack
         getSupportFragmentManager().beginTransaction()
                 .replace(id, BookDetailFragment.newInstance(event.getSelectedBook()))
                 .addToBackStack("Book Detail")
                 .commit();
-    }
-
-
-    private class MessageReciever extends BroadcastReceiver {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            if(intent.getStringExtra(MESSAGE_KEY)!=null){
-                Toast.makeText(MainActivity.this, intent.getStringExtra(MESSAGE_KEY), Toast.LENGTH_LONG).show();
-            }
-        }
     }
 
     public void goBack(View view){
@@ -193,6 +199,34 @@ public class MainActivity extends ActionBarActivity implements NavigationDrawerF
             finish();
         }
         super.onBackPressed();
+    }
+
+    /**
+     * Handles notifications broadcasted by {@link BookService}.
+     */
+    private class NotificationBroadcastReciever extends BroadcastReceiver {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            if (intent.getCategories() == null
+                    || intent.getCategories().size() != 1) {
+                Log.e(LOG_TAG, "Expected one category.");
+                return;
+            }
+            String message = null;
+            final String category = intent.getCategories().iterator().next();
+            if (BookService.CATEGORY_NO_RESULT.equals(category)) {
+                message = getString(R.string.no_result);
+            } else if (BookService.CATEGORY_DOWNLOAD_ERROR.equals(category)) {
+                message = getString(R.string.download_error);
+            } else if (BookService.CATEGORY_RESULT_PROCESSING_ERROR.equals(category)) {
+                message = getString(R.string.response_processing_error);
+            } else {
+                Log.e(LOG_TAG, "Unexpected notification category "+ category);
+            }
+            if (message != null) {
+                Toast.makeText(MainActivity.this, message, Toast.LENGTH_LONG).show();
+            }
+        }
     }
 
 
