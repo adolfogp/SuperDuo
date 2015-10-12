@@ -5,41 +5,51 @@
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.CAMERA" />
+
     <uses-feature android:name="android.hardware.camera" />
     <uses-feature android:name="android.hardware.camera.autofocus" />
-
 
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:theme="@style/AppTheme" >
-
         <activity
             android:name=".view.activity.MainActivity"
-            android:configChanges="orientation"
             android:label="@string/app_name" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
         <activity
-            android:label="@string/title_activity_settings"
-            android:name=".view.activity.SettingsActivity"
+            android:name=".view.activity.BookDetailActivity"
+            android:label="@string/title_activity_book_detail"
             android:parentActivityName=".view.activity.MainActivity" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value=".view.activity.MainActivity" />
+                android:value="it.jaschke.alexandria.view.activity.MainActivity" />
         </activity>
+        <activity
+            android:name=".view.activity.BookAdditionActivity"
+            android:label="@string/title_activity_book_addition"
+            android:parentActivityName=".view.activity.MainActivity" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="it.jaschke.alexandria.view.activity.MainActivity" />
+        </activity>
+
         <provider
             android:name=".data.BookProvider"
             android:authorities="it.jaschke.alexandria"
             android:exported="false" />
+
         <service
             android:name=".service.BookService"
             android:exported="false" >
         </service>
+
     </application>
 
 </manifest>

@@ -15,14 +15,9 @@
   ~ limitations under the License.
   -->
 
-<menu xmlns:android="http://schemas.android.com/apk/res/android"
-      xmlns:app="http://schemas.android.com/apk/res-auto"
-      xmlns:tools="http://schemas.android.com/tools"
-      tools:context=".MainActivity">
-
-    <item
-        android:id="@+id/menu_item_add_book"
-        android:title="@string/action_add_book"
-        app:showAsAction="ifRoom" />
-
-</menu>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+             xmlns:tools="http://schemas.android.com/tools"
+             android:id="@+id/book_detail_container"
+             android:layout_width="match_parent"
+             android:layout_height="match_parent"
+             tools:layout="@layout/fragment_book_detail"/>

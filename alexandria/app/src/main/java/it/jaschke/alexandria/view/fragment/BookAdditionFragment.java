@@ -1,6 +1,5 @@
 package it.jaschke.alexandria.view.fragment;
 
-import android.app.Activity;
 import android.content.Intent;
 import android.database.Cursor;
 import android.os.Bundle;
@@ -31,28 +30,17 @@ import it.jaschke.alexandria.model.domain.Book;
 import it.jaschke.alexandria.service.BookService;
 
 
-public class AddBookFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
+public class BookAdditionFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
 
     /**
      * Identifies the messages written to the log by this class.
      */
-    private static final String LOG_TAG = AddBookFragment.class.getSimpleName();
+    private static final String LOG_TAG = BookAdditionFragment.class.getSimpleName();
 
-    private static final String TAG = "INTENT_TO_SCAN_ACTIVITY";
     private EditText ean;
     private final int LOADER_ID = 1;
     private View rootView;
     private final String EAN_CONTENT="eanContent";
-    private static final String SCAN_FORMAT = "scanFormat";
-    private static final String SCAN_CONTENTS = "scanContents";
-
-    private String mScanFormat = "Format:";
-    private String mScanContents = "Contents:";
-
-
-
-    public AddBookFragment(){
-    }
 
     @Override
     public void onSaveInstanceState(Bundle outState) {
@@ -65,7 +53,7 @@ public class AddBookFragment extends Fragment implements LoaderManager.LoaderCal
     @Override
     public View onCreateView(final LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
-        rootView = inflater.inflate(R.layout.fragment_add_book, container, false);
+        rootView = inflater.inflate(R.layout.fragment_book_addition, container, false);
         ean = (EditText) rootView.findViewById(R.id.ean);
 
         ean.addTextChangedListener(new TextWatcher() {
@@ -98,7 +86,7 @@ public class AddBookFragment extends Fragment implements LoaderManager.LoaderCal
                         , Parcels.wrap(book));
                 bookIntent.setAction(BookService.ACTION_FETCH_BOOK);
                 getActivity().startService(bookIntent);
-                AddBookFragment.this.restartLoader();
+                BookAdditionFragment.this.restartLoader();
             }
         });
 
@@ -112,7 +100,7 @@ public class AddBookFragment extends Fragment implements LoaderManager.LoaderCal
                 // Hint: Use a Try/Catch block to handle the Intent dispatch gracefully, if you
                 // are using an external app.
                 //when you're done, remove the toast below.
-                IntentIntegrator.forSupportFragment(AddBookFragment.this)
+                IntentIntegrator.forSupportFragment(BookAdditionFragment.this)
                         .setDesiredBarcodeFormats(IntentIntegrator.ONE_D_CODE_TYPES)
                         .initiateScan();
             }
@@ -230,9 +218,4 @@ public class AddBookFragment extends Fragment implements LoaderManager.LoaderCal
         rootView.findViewById(R.id.delete_button).setVisibility(View.INVISIBLE);
     }
 
-    @Override
-    public void onAttach(Activity activity) {
-        super.onAttach(activity);
-        activity.setTitle(R.string.scan);
-    }
 }

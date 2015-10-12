@@ -15,14 +15,7 @@
   ~ limitations under the License.
   -->
 
-<menu xmlns:android="http://schemas.android.com/apk/res/android"
-      xmlns:app="http://schemas.android.com/apk/res-auto"
-      xmlns:tools="http://schemas.android.com/tools"
-      tools:context=".MainActivity">
-
-    <item
-        android:id="@+id/menu_item_add_book"
-        android:title="@string/action_add_book"
-        app:showAsAction="ifRoom" />
-
-</menu>
+<resources>
+    <item name="popular_movies_green" type="color">#FF9800</item>
+    <item name="popular_movies_dark_green" type="color">#EF6C00</item>
+</resources>

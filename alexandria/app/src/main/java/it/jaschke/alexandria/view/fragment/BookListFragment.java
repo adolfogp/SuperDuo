@@ -1,6 +1,5 @@
 package it.jaschke.alexandria.view.fragment;
 
-import android.app.Activity;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -21,8 +20,14 @@ import it.jaschke.alexandria.model.event.BookSelectionEvent;
 import it.jaschke.alexandria.view.adapter.BookListAdapter;
 import it.jaschke.alexandria.data.BookContract;
 
-
-public class ListOfBooksFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
+/**
+ * Displays a list of the books in the {@code ContentProvider}, including
+ * their title and cover image.
+ *
+ * @author Sascha Jaschke
+ * @author Jesús Adolfo García Pasquel
+ */
+public class BookListFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
 
     private BookListAdapter bookListAdapter;
     private ListView bookList;
@@ -31,7 +36,7 @@ public class ListOfBooksFragment extends Fragment implements LoaderManager.Loade
 
     private final int LOADER_ID = 10;
 
-    public ListOfBooksFragment() {
+    public BookListFragment() {
     }
 
     @Override
@@ -52,13 +57,13 @@ public class ListOfBooksFragment extends Fragment implements LoaderManager.Loade
 
 
         bookListAdapter = new BookListAdapter(getActivity(), cursor, 0);
-        View rootView = inflater.inflate(R.layout.fragment_list_of_books, container, false);
+        View rootView = inflater.inflate(R.layout.fragment_book_list, container, false);
         searchText = (EditText) rootView.findViewById(R.id.searchText);
         rootView.findViewById(R.id.searchButton).setOnClickListener(
                 new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        ListOfBooksFragment.this.restartLoader();
+                        BookListFragment.this.restartLoader();
                     }
                 }
         );
@@ -129,9 +134,4 @@ public class ListOfBooksFragment extends Fragment implements LoaderManager.Loade
         bookListAdapter.swapCursor(null);
     }
 
-    @Override
-    public void onAttach(Activity activity) {
-        super.onAttach(activity);
-        activity.setTitle(R.string.books);
-    }
 }

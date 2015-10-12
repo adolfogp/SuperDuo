@@ -1,4 +1,3 @@
-<?xml version="1.0" encoding="utf-8"?>
 <!--
   ~ Copyright 2015 Jesús Adolfo García Pasquel
   ~
@@ -15,14 +14,10 @@
   ~ limitations under the License.
   -->
 
-<menu xmlns:android="http://schemas.android.com/apk/res/android"
-      xmlns:app="http://schemas.android.com/apk/res-auto"
-      xmlns:tools="http://schemas.android.com/tools"
-      tools:context=".MainActivity">
-
-    <item
-        android:id="@+id/menu_item_add_book"
-        android:title="@string/action_add_book"
-        app:showAsAction="ifRoom" />
-
-</menu>
+<fragment android:id="@+id/fragment_book_addition"
+          android:name="it.jaschke.alexandria.view.fragment.BookAdditionFragment"
+          xmlns:android="http://schemas.android.com/apk/res/android"
+          xmlns:tools="http://schemas.android.com/tools"
+          android:layout_width="match_parent"
+          android:layout_height="match_parent"
+          tools:layout="@layout/fragment_book_addition"/>

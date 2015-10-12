@@ -14,3 +14,11 @@ as part of the third project assignment for [Udacity's Android Developer Nanodeg
 * Added domain model objects to improve the object oriented design of the
   solution.
 * Broke up large methods into smaller ones.
+* Replaced ActionBarActivity (deprecated) with AppCompatActivity in MainActivity.
+* Changed app navigation since the methods it used were deprecated, opting
+  to use common navigation patterns as [suggested by the documentation]
+  (http://developer.android.com/reference/android/support/v7/app/ActionBar.html#setNavigationMode%28int%29)
+* Removed the navigation drawer and settings activity since they do not apply
+  to the new navigation pattern.
+* Added activities to present the different fragments when running on a phone
+  (previously there was only one activity and many transactions on fragments).

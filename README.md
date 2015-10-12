@@ -9,6 +9,12 @@ The project contains two applications:
 * Alexandria
 * Football Scores
 
+The changes made to the original code can be found in the `README.md` files
+of each application.
+
+* [Changes made to Alexandria](alexandria/README.md)
+* [Changes made to Football Scores](Football_Scores-master/README.md)
+
 ## Building the applications
 
 ### Requirements:
