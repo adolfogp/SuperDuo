@@ -24,3 +24,6 @@ as part of the third project assignment for [Udacity's Android Developer Nanodeg
   (previously there was only one activity and many transactions on fragments).
 * Fixed Loader registration. The Loader for the list of books dit not work
   properly, since it was not registered at onActivityCreated.
+* Removed cursor column searching from the CursorAdapter and replaced it with
+  direct column access (constants for the columns corresponding to the projection).
+* Replaced the use of ViewHolder in the CursorAdapter with Data Binding Library.

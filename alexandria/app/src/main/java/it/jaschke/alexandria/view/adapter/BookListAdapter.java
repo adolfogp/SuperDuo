@@ -3,17 +3,17 @@ package it.jaschke.alexandria.view.adapter;
 
 import android.content.Context;
 import android.database.Cursor;
+import android.databinding.DataBindingUtil;
 import android.support.v4.widget.CursorAdapter;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
-import android.widget.TextView;
 
 import com.squareup.picasso.Picasso;
 
 import it.jaschke.alexandria.R;
 import it.jaschke.alexandria.data.BookContract;
+import it.jaschke.alexandria.databinding.BookListItemBinding;
 
 import static it.jaschke.alexandria.data.BookContract.BookEntry;
 
@@ -59,43 +59,34 @@ public class BookListAdapter extends CursorAdapter {
      */
     public static final int COL_COVER_IMAGE_URL = 3;
 
-
-    public static class ViewHolder {
-        public final ImageView bookCover;
-        public final TextView bookTitle;
-        public final TextView bookSubTitle;
-
-        public ViewHolder(View view) {
-            bookCover = (ImageView) view.findViewById(R.id.fullBookCover);
-            bookTitle = (TextView) view.findViewById(R.id.listBookTitle);
-            bookSubTitle = (TextView) view.findViewById(R.id.listBookSubTitle);
-        }
-    }
-
-    public BookListAdapter(Context context, Cursor c, int flags) {
-        super(context, c, flags);
-    }
-
-    @Override
-    public void bindView(View view, Context context, Cursor cursor) {
-        ViewHolder viewHolder = (ViewHolder) view.getTag();
-        String bookTitle = cursor.getString(COL_TITLE);
-        viewHolder.bookTitle.setText(bookTitle);
-        String bookSubTitle = cursor.getString(COL_SUBTITLE);
-        viewHolder.bookSubTitle.setText(bookSubTitle);
-        String imgUrl = cursor.getString(COL_COVER_IMAGE_URL);
-        Picasso.with(context)
-                .load(imgUrl)
-                .into(viewHolder.bookCover);
+    /**
+     * Creates a new instance of {@link BookListAdapter}.
+     *
+     * @param context the {@link Context}.
+     * @param cursor the {@link Cursor} from which the data is retrieved.
+     * @param flags flags that determine the behaviour of the adapter.
+     */
+    public BookListAdapter(Context context, Cursor cursor, int flags) {
+        super(context, cursor, flags);
     }
 
     @Override
     public View newView(Context context, Cursor cursor, ViewGroup parent) {
-        View view = LayoutInflater.from(context).inflate(R.layout.book_list_item, parent, false);
-
-        ViewHolder viewHolder = new ViewHolder(view);
-        view.setTag(viewHolder);
-
-        return view;
+        LayoutInflater layoutInflater = LayoutInflater.from(context);
+        BookListItemBinding binding = DataBindingUtil.inflate(
+                layoutInflater, R.layout.book_list_item, parent, false);
+        binding.getRoot().setTag(binding);
+        return binding.getRoot();
     }
+
+    @Override
+    public void bindView(View view, Context context, Cursor cursor) {
+        BookListItemBinding binding = (BookListItemBinding) view.getTag();
+        binding.bookTitleTextView.setText(cursor.getString(COL_TITLE));
+        binding.bookSubtitleTextView.setText(cursor.getString(COL_SUBTITLE));
+        Picasso.with(context)
+                .load(cursor.getString(COL_COVER_IMAGE_URL))
+                .into(binding.bookCoverImageView);
+    }
+
 }
