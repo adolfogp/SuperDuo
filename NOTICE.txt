@@ -10,3 +10,9 @@ can be found at https://github.com/vincentbrison/vb-android-app-quality
 The XSLT file used to generate the HTML Checkstyle report,
 (checkstyle-noframes-sorted.xsl) was taken from:
 https://svn.apache.org/repos/asf/hive/trunk/checkstyle/
+
+ic_action_book_plus.png is based on the CC-BY 4.0 licensed SVG image book.svg
+available at https://materialdesignicons.com/
+
+ic_launcher.png is based on the CC-BY 4.0 licensed SVG image book-open.svg
+available at https://materialdesignicons.com/

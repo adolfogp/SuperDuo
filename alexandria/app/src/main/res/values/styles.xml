@@ -2,8 +2,19 @@
 
     <!-- Base application theme. -->
     <style name="AppTheme" parent="@style/Theme.AppCompat.Light.DarkActionBar">
-        <item name="colorPrimary">@color/popular_movies_green</item>
-        <item name="colorPrimaryDark">@color/popular_movies_dark_green</item>
+        <item name="colorPrimary">@color/alexandria_orange</item>
+        <item name="colorPrimaryDark">@color/alexandria_dark_orange</item>
+    </style>
+
+    <style name="ActionBar.Solid.Alexandria.NoTitle"
+           parent="@style/Widget.AppCompat.Light.ActionBar.Solid.Inverse">
+        <item name="displayOptions">useLogo|showHome</item>
+        <item name="logo">@drawable/ic_logo</item>
+    </style>
+
+    <!-- Main activity theme. -->
+    <style name="BookListTheme" parent="AppTheme">
+        <item name="actionBarStyle">@style/ActionBar.Solid.Alexandria.NoTitle</item>
     </style>
 
 </resources>

@@ -22,6 +22,7 @@
 
     <item
         android:id="@+id/menu_item_add_book"
+        android:icon="@drawable/ic_action_book_plus"
         android:title="@string/action_add_book"
         app:showAsAction="ifRoom" />
 
