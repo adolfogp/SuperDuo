@@ -22,3 +22,5 @@ as part of the third project assignment for [Udacity's Android Developer Nanodeg
   to the new navigation pattern.
 * Added activities to present the different fragments when running on a phone
   (previously there was only one activity and many transactions on fragments).
+* Fixed Loader registration. The Loader for the list of books dit not work
+  properly, since it was not registered at onActivityCreated.

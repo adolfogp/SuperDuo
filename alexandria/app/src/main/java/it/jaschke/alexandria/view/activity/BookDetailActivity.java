@@ -59,11 +59,9 @@ public class BookDetailActivity extends AppCompatActivity {
         setContentView(R.layout.activity_book_detail);
         FragmentManager fragmentManager = getSupportFragmentManager();
         if (fragmentManager.findFragmentByTag(BOOK_DETAIL_FRAGMENT_TAG) == null) {
-            BookDetailFragment bookDetailFragment =
-                    BookDetailFragment.newInstance(book);
             FragmentTransaction transaction = fragmentManager.beginTransaction();
             transaction.add(R.id.book_detail_container
-                    , bookDetailFragment
+                    , BookDetailFragment.newInstance(book)
                     , BOOK_DETAIL_FRAGMENT_TAG);
             transaction.commit();
         }

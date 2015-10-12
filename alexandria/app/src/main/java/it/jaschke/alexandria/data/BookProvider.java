@@ -249,19 +249,19 @@ public class BookProvider extends ContentProvider {
     public String getType(Uri uri) {
         switch (uriMatcher.match(uri)) {
             case BOOK_FULLDETAIL:
-                return BookContract.BookEntry.CONTENT_ITEM_TYPE;
+                return BookEntry.CONTENT_ITEM_TYPE;
             case BOOK_ID:
-                return BookContract.BookEntry.CONTENT_ITEM_TYPE;
+                return BookEntry.CONTENT_ITEM_TYPE;
             case AUTHOR_ID:
-                return BookContract.AuthorEntry.CONTENT_ITEM_TYPE;
+                return AuthorEntry.CONTENT_ITEM_TYPE;
             case CATEGORY_ID:
-                return BookContract.CategoryEntry.CONTENT_ITEM_TYPE;
+                return CategoryEntry.CONTENT_ITEM_TYPE;
             case BOOK:
-                return BookContract.BookEntry.CONTENT_TYPE;
+                return BookEntry.CONTENT_TYPE;
             case AUTHOR:
-                return BookContract.AuthorEntry.CONTENT_TYPE;
+                return AuthorEntry.CONTENT_TYPE;
             case CATEGORY:
-                return BookContract.CategoryEntry.CONTENT_TYPE;
+                return CategoryEntry.CONTENT_TYPE;
             default:
                 throw new UnsupportedOperationException("Unknown uri: " + uri);
         }

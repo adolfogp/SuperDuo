@@ -124,10 +124,9 @@ public class MainActivity extends AppCompatActivity {
     private void showBookDetail(Book book) {
         if (mTwoPane) {
             FragmentManager fragmentManager = getSupportFragmentManager();
-            BookDetailFragment movieDetailFragment =
-                    BookDetailFragment.newInstance(book);
             FragmentTransaction transaction = fragmentManager.beginTransaction();
-            transaction.replace(R.id.book_detail_container, movieDetailFragment);
+            transaction.replace(R.id.book_detail_container
+                    , BookDetailFragment.newInstance(book));
             transaction.commit();
         } else {
             Intent intent = new Intent(this, BookDetailActivity.class);

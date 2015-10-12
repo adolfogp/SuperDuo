@@ -29,12 +29,17 @@ import it.jaschke.alexandria.data.BookContract;
  */
 public class BookListFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
 
+    /**
+     * Identifies the messages written to the log by this class.
+     */
+    private static final String LOG_TAG = BookListFragment.class.getSimpleName();
+
     private BookListAdapter bookListAdapter;
     private ListView bookList;
     private int position = ListView.INVALID_POSITION;
     private EditText searchText;
 
-    private final int LOADER_ID = 10;
+    private final int BOOK_LIST_LOADER_ID = 10;
 
     public BookListFragment() {
     }
@@ -46,17 +51,7 @@ public class BookListFragment extends Fragment implements LoaderManager.LoaderCa
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-
-        Cursor cursor = getActivity().getContentResolver().query(
-                BookContract.BookEntry.CONTENT_URI,
-                null, // leaving "columns" null just returns all the columns.
-                null, // cols for "where" clause
-                null, // values for "where" clause
-                null  // sort order
-        );
-
-
-        bookListAdapter = new BookListAdapter(getActivity(), cursor, 0);
+        bookListAdapter = new BookListAdapter(getActivity(), null, 0);
         View rootView = inflater.inflate(R.layout.fragment_book_list, container, false);
         searchText = (EditText) rootView.findViewById(R.id.searchText);
         rootView.findViewById(R.id.searchButton).setOnClickListener(
@@ -75,6 +70,7 @@ public class BookListFragment extends Fragment implements LoaderManager.LoaderCa
 
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
+                // TODO: Use view model, fix this mess
                 Cursor cursor = bookListAdapter.getCursor();
                 if (cursor != null && cursor.moveToPosition(position)) {
                     Book selectedBook = new Book();
@@ -89,8 +85,16 @@ public class BookListFragment extends Fragment implements LoaderManager.LoaderCa
         return rootView;
     }
 
+    @Override
+    public void onActivityCreated(Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+        getLoaderManager().initLoader(BOOK_LIST_LOADER_ID, null, this);
+    }
+
+
+    // TODO: This does not look right. Verify.
     private void restartLoader(){
-        getLoaderManager().restartLoader(LOADER_ID, null, this);
+        getLoaderManager().restartLoader(BOOK_LIST_LOADER_ID, null, this);
     }
 
     @Override
@@ -99,22 +103,22 @@ public class BookListFragment extends Fragment implements LoaderManager.LoaderCa
         final String selection = BookContract.BookEntry.COLUMN_TITLE +" LIKE ? OR " + BookContract.BookEntry.COLUMN_SUBTITLE + " LIKE ? ";
         String searchString =searchText.getText().toString();
 
-        if(searchString.length()>0){
+        // TODO: This does not look right. Verify.
+        if(searchString.length() > 0){
             searchString = "%"+searchString+"%";
             return new CursorLoader(
                     getActivity(),
                     BookContract.BookEntry.CONTENT_URI,
-                    null,
+                    BookListAdapter.PROJECTION_BOOK_LIST,
                     selection,
                     new String[]{searchString,searchString},
                     null
             );
         }
-
         return new CursorLoader(
                 getActivity(),
                 BookContract.BookEntry.CONTENT_URI,
-                null,
+                BookListAdapter.PROJECTION_BOOK_LIST,
                 null,
                 null,
                 null
