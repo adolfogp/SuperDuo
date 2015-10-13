@@ -27,3 +27,5 @@ as part of the third project assignment for [Udacity's Android Developer Nanodeg
 * Removed cursor column searching from the CursorAdapter and replaced it with
   direct column access (constants for the columns corresponding to the projection).
 * Replaced the use of ViewHolder in the CursorAdapter with Data Binding Library.
+* Renamed member variables, so they are prefixed by 'm' as required by the standard.
+* Removed logic from views (Fragments) and placed it in view models.

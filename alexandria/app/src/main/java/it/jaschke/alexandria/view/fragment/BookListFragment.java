@@ -1,22 +1,24 @@
 package it.jaschke.alexandria.view.fragment;
 
 import android.database.Cursor;
+import android.databinding.DataBindingUtil;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
-import android.widget.EditText;
-import android.widget.ListView;
 
-import de.greenrobot.event.EventBus;
+import org.apache.commons.lang3.StringUtils;
+import org.parceler.Parcels;
+
 import it.jaschke.alexandria.R;
-import it.jaschke.alexandria.model.domain.Book;
-import it.jaschke.alexandria.model.event.BookSelectionEvent;
+import it.jaschke.alexandria.databinding.BookListFragmentBinding;
+import it.jaschke.alexandria.model.view.BookListViewModel;
 import it.jaschke.alexandria.view.adapter.BookListAdapter;
 import it.jaschke.alexandria.data.BookContract;
 
@@ -34,55 +36,66 @@ public class BookListFragment extends Fragment implements LoaderManager.LoaderCa
      */
     private static final String LOG_TAG = BookListFragment.class.getSimpleName();
 
-    private BookListAdapter bookListAdapter;
-    private ListView bookList;
-    private int position = ListView.INVALID_POSITION;
-    private EditText searchText;
+    /**
+     * Identifies the {@link Loader} that retrieves the book data.
+     */
+    private static final int BOOK_LIST_LOADER_ID = 527669;
 
-    private final int BOOK_LIST_LOADER_ID = 10;
+    /**
+     * Key used to save and retrieve the serialized {@link #mViewModel}.
+     */
+    private static final String STATE_VIEW_MODEL = "state_view_model";
 
-    public BookListFragment() {
-    }
+    /**
+     * Binds the view to the view model.
+     * @see BookListViewModel
+     */
+    private BookListFragmentBinding mBinding = null;
+
+    /**
+     * View model that provides data and behaviour to the
+     * {@link BookListFragment}.
+     */
+    private BookListViewModel mViewModel;
+
+    /**
+     * Adapter that provides the {@link View}s for presenting each book.
+     */
+    private BookListAdapter mBookListAdapter;
+
+    private final View.OnClickListener searchClickLister = (view) -> {
+        Log.wtf(LOG_TAG, "searchString: " + mViewModel.getSearchString());
+        BookListFragment.this.restartLoader();
+        mViewModel.clearSelectedPosition();
+    };
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        restoreState(savedInstanceState);
+        if (mViewModel == null) {
+            mViewModel = new BookListViewModel();
+        }
+    }
+
+    /**
+     * Loads the previous state, stored in the {@link Bundle} passed as argument,
+     * into to {@link BookListFragment}. {@link #mViewModel} in particular.
+     * If the argument is {@code null}, nothing is done.
+     *
+     * @param savedInstanceState the {@link BookListFragment}'s previous state.
+     */
+    private void restoreState(Bundle savedInstanceState) {
+        if (savedInstanceState == null) {
+            return;
+        }
+        mViewModel = Parcels.unwrap(savedInstanceState.getParcelable(STATE_VIEW_MODEL));
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        bookListAdapter = new BookListAdapter(getActivity(), null, 0);
-        View rootView = inflater.inflate(R.layout.fragment_book_list, container, false);
-        searchText = (EditText) rootView.findViewById(R.id.searchText);
-        rootView.findViewById(R.id.searchButton).setOnClickListener(
-                new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        BookListFragment.this.restartLoader();
-                    }
-                }
-        );
-
-        bookList = (ListView) rootView.findViewById(R.id.listOfBooks);
-        bookList.setAdapter(bookListAdapter);
-
-        bookList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-
-            @Override
-            public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
-                // TODO: Use view model, fix this mess
-                Cursor cursor = bookListAdapter.getCursor();
-                if (cursor != null && cursor.moveToPosition(position)) {
-                    Book selectedBook = new Book();
-                    // TODO: Remove usage of getColumnIndex
-                    selectedBook.setId(cursor.getLong(
-                            cursor.getColumnIndex(BookContract.BookEntry._ID)));
-                    EventBus.getDefault().post(new BookSelectionEvent(selectedBook));
-                }
-            }
-        });
-
-        return rootView;
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putParcelable(STATE_VIEW_MODEL, Parcels.wrap(mViewModel));
     }
 
     @Override
@@ -91,6 +104,20 @@ public class BookListFragment extends Fragment implements LoaderManager.LoaderCa
         getLoaderManager().initLoader(BOOK_LIST_LOADER_ID, null, this);
     }
 
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        mBinding = DataBindingUtil.inflate(inflater
+                , R.layout.fragment_book_list
+                , container
+                , false);
+        mBinding.setViewModel(mViewModel);
+        mBookListAdapter = new BookListAdapter(getActivity(), null, 0);
+        mBinding.bookListView.setAdapter(mBookListAdapter);
+        mBinding.searchEditText.addTextChangedListener(
+                mViewModel.getSearchStringWatcher());
+        mBinding.searchImageButton.setOnClickListener(searchClickLister);
+        return mBinding.getRoot();
+    }
 
     // TODO: This does not look right. Verify.
     private void restartLoader(){
@@ -99,12 +126,13 @@ public class BookListFragment extends Fragment implements LoaderManager.LoaderCa
 
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
+        // TODO: fix all of this.
 
         final String selection = BookContract.BookEntry.COLUMN_TITLE +" LIKE ? OR " + BookContract.BookEntry.COLUMN_SUBTITLE + " LIKE ? ";
-        String searchString =searchText.getText().toString();
+        String searchString = mViewModel.getSearchString();
 
         // TODO: This does not look right. Verify.
-        if(searchString.length() > 0){
+        if(StringUtils.trimToNull(searchString) != null) {
             searchString = "%"+searchString+"%";
             return new CursorLoader(
                     getActivity(),
@@ -127,15 +155,26 @@ public class BookListFragment extends Fragment implements LoaderManager.LoaderCa
 
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
-        bookListAdapter.swapCursor(data);
-        if (position != ListView.INVALID_POSITION) {
-            bookList.smoothScrollToPosition(position);
+        Cursor oldCursor = mBookListAdapter.swapCursor(data);
+        if (oldCursor != null) {
+            oldCursor.close();
+        }
+
+        // Scroll to the last selected item if reloading after an event
+        // that causes the first item to be shown (e.g. configuration change).
+        if (mBinding.bookListView.getFirstVisiblePosition() == 0
+                && mViewModel.getSelectedPosition() != AdapterView.INVALID_POSITION) {
+            mBinding.bookListView.smoothScrollToPosition(
+                    mViewModel.getSelectedPosition());
         }
     }
 
     @Override
     public void onLoaderReset(Loader<Cursor> loader) {
-        bookListAdapter.swapCursor(null);
+        Cursor oldCursor = mBookListAdapter.swapCursor(null);
+        if (oldCursor != null) {
+            oldCursor.close();
+        }
     }
 
 }
