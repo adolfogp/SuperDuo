@@ -19,6 +19,7 @@ package it.jaschke.alexandria.model.view;
 import android.databinding.BaseObservable;
 import android.databinding.Bindable;
 import android.databinding.adapters.TextViewBindingAdapter;
+import android.net.Uri;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
@@ -30,8 +31,13 @@ import org.parceler.Parcel;
 
 import de.greenrobot.event.EventBus;
 import it.jaschke.alexandria.BR;
+import it.jaschke.alexandria.data.BookContract;
 import it.jaschke.alexandria.model.domain.Book;
 import it.jaschke.alexandria.model.event.BookSelectionEvent;
+import it.jaschke.alexandria.model.event.SearchStringChangeEvent;
+import it.jaschke.alexandria.view.adapter.BookListAdapter;
+
+import static it.jaschke.alexandria.data.BookContract.BookEntry;
 
 /**
  * View model for the book list's view. Provides data and behaviour.
@@ -45,6 +51,14 @@ public class BookListViewModel {
      * Identifies messages written to the log by this class.
      */
     private static final String LOG_TAG = BookListViewModel.class.getSimpleName();
+
+    /**
+     * Selection clause used to search for text in the title or subtitle of
+     * a book.
+     */
+    private static final String SELECTION_PARTIAL_TITLE =
+            BookEntry.COLUMN_TITLE +" LIKE ? OR "
+            + BookEntry.COLUMN_SUBTITLE + " LIKE ? ";
 
     /**
      * The position of the currently selected book, possibly
@@ -116,9 +130,10 @@ public class BookListViewModel {
         if (StringUtils.equals(mSearchString, searchString)) {
             return;
         }
+        String old = mSearchString;
         mSearchString = searchString;
-        Log.v(LOG_TAG, "Search string changed: " + mSearchString);
-
+        EventBus.getDefault().post(
+                new SearchStringChangeEvent(old, mSearchString));
     }
 
     public AdapterView.OnItemClickListener getBookClickListener() {
@@ -127,6 +142,50 @@ public class BookListViewModel {
 
     public TextWatcher getSearchStringWatcher() {
         return mSearchStringWatcher;
+    }
+
+    /**
+     * Returns the content {@link Uri} from which the list of books is retrieved.
+     *
+     * @returnthe content {@link Uri} from which the list of books is retrieved.
+     */
+    public Uri getBookListQueryUri() {
+        return BookContract.BookEntry.CONTENT_URI;
+    }
+
+    /**
+     * Returns the projection used on the query to retrieve the list of books.
+     *
+     * @return the projection used on the query to retrieve the list of books.
+     * @see BookListAdapter#PROJECTION_BOOK_LIST
+     */
+    public String[] getBookListQueryProjection() {
+        return BookListAdapter.PROJECTION_BOOK_LIST;
+    }
+
+    /**
+     * Returns the selection clause used on the query to retrieve the list of books.
+     *
+     * @return the selection clause used on the query to retrieve the list of books.
+     */
+    public String getBookListQuerySelection() {
+        return StringUtils.trimToNull(mSearchString) != null
+                ? SELECTION_PARTIAL_TITLE
+                : null;
+    }
+
+    /**
+     * Returns the arguments for the selection clause used on the query to
+     * retrieve the list of books.
+     *
+     * @return the arguments for the selection clause used on the query to
+     *     retrieve the list of books.
+     */
+    public String[] getBookListQuerySelectionArguments() {
+        String searchPattern = "%" + mSearchString + "%";
+        return StringUtils.trimToNull(mSearchString) != null
+                ? new String[] {searchPattern, searchPattern}
+                : null;
     }
 
 }

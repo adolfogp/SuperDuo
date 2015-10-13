@@ -16,8 +16,10 @@ import android.widget.AdapterView;
 import org.apache.commons.lang3.StringUtils;
 import org.parceler.Parcels;
 
+import de.greenrobot.event.EventBus;
 import it.jaschke.alexandria.R;
 import it.jaschke.alexandria.databinding.BookListFragmentBinding;
+import it.jaschke.alexandria.model.event.SearchStringChangeEvent;
 import it.jaschke.alexandria.model.view.BookListViewModel;
 import it.jaschke.alexandria.view.adapter.BookListAdapter;
 import it.jaschke.alexandria.data.BookContract;
@@ -63,11 +65,12 @@ public class BookListFragment extends Fragment implements LoaderManager.LoaderCa
      */
     private BookListAdapter mBookListAdapter;
 
-    private final View.OnClickListener searchClickLister = (view) -> {
-        Log.wtf(LOG_TAG, "searchString: " + mViewModel.getSearchString());
-        BookListFragment.this.restartLoader();
-        mViewModel.clearSelectedPosition();
-    };
+    /**
+     * Updates the book list when the search button is clicked.
+     *
+     * @see #updateBookList()
+     */
+    private final View.OnClickListener searchClickLister = (view) -> updateBookList();
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -105,7 +108,9 @@ public class BookListFragment extends Fragment implements LoaderManager.LoaderCa
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+    public View onCreateView(LayoutInflater inflater
+            , ViewGroup container
+            , Bundle savedInstanceState) {
         mBinding = DataBindingUtil.inflate(inflater
                 , R.layout.fragment_book_list
                 , container
@@ -119,38 +124,49 @@ public class BookListFragment extends Fragment implements LoaderManager.LoaderCa
         return mBinding.getRoot();
     }
 
-    // TODO: This does not look right. Verify.
-    private void restartLoader(){
+    @Override
+    public void onResume() {
+        EventBus.getDefault().register(this);
+        super.onResume();
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        EventBus.getDefault().unregister(this);
+    }
+
+    /**
+     * Restarts the {@code CursorLoader} to query the {@code ContentProvider}
+     * again, considering the current value of the search string and resets
+     * the currently selected position.
+     *
+     * @see BookListViewModel#getSearchString()
+     * @see BookListViewModel#getSelectedPosition()
+     */
+    private void updateBookList() {
         getLoaderManager().restartLoader(BOOK_LIST_LOADER_ID, null, this);
+        mViewModel.clearSelectedPosition();
+    }
+
+    /**
+     * Updates the book list when the event occurs.
+     *
+     * @param event search string change.
+     * @see #updateBookList()
+     */
+    public void onEvent(SearchStringChangeEvent event) {
+        updateBookList();
     }
 
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
-        // TODO: fix all of this.
-
-        final String selection = BookContract.BookEntry.COLUMN_TITLE +" LIKE ? OR " + BookContract.BookEntry.COLUMN_SUBTITLE + " LIKE ? ";
-        String searchString = mViewModel.getSearchString();
-
-        // TODO: This does not look right. Verify.
-        if(StringUtils.trimToNull(searchString) != null) {
-            searchString = "%"+searchString+"%";
-            return new CursorLoader(
-                    getActivity(),
-                    BookContract.BookEntry.CONTENT_URI,
-                    BookListAdapter.PROJECTION_BOOK_LIST,
-                    selection,
-                    new String[]{searchString,searchString},
-                    null
-            );
-        }
-        return new CursorLoader(
-                getActivity(),
-                BookContract.BookEntry.CONTENT_URI,
-                BookListAdapter.PROJECTION_BOOK_LIST,
-                null,
-                null,
-                null
-        );
+        return new CursorLoader(getActivity()
+                , mViewModel.getBookListQueryUri()
+                , mViewModel.getBookListQueryProjection()
+                , mViewModel.getBookListQuerySelection()
+                , mViewModel.getBookListQuerySelectionArguments()
+                , null);
     }
 
     @Override

@@ -29,3 +29,5 @@ as part of the third project assignment for [Udacity's Android Developer Nanodeg
 * Replaced the use of ViewHolder in the CursorAdapter with Data Binding Library.
 * Renamed member variables, so they are prefixed by 'm' as required by the standard.
 * Removed logic from views (Fragments) and placed it in view models.
+* The list of books is filetered as the user types the search string.
+
