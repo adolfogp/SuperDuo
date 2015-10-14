@@ -16,6 +16,8 @@
 
 package it.jaschke.alexandria.model.domain;
 
+import android.net.Uri;
+
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
@@ -34,6 +36,26 @@ public class Book {
      */
     private long mId;
 
+    /**
+     * The book's title.
+     */
+    private String mTitle;
+
+    /**
+     * The book's subtitle.
+     */
+    private String mSubtitle;
+
+    /**
+     * The book's description.
+     */
+    private String mDescription;
+
+    /**
+     * URI of the book's cover image.
+     */
+    private Uri mCoverUri;
+
     public long getId() {
         return mId;
     }
@@ -42,12 +64,48 @@ public class Book {
         mId = id;
     }
 
+    public String getTitle() {
+        return mTitle;
+    }
+
+    public void setTitle(String title) {
+        mTitle = title;
+    }
+
+    public String getSubtitle() {
+        return mSubtitle;
+    }
+
+    public void setSubtitle(String subtitle) {
+        mSubtitle = subtitle;
+    }
+
+    public String getDescription() {
+        return mDescription;
+    }
+
+    public void setDescription(String description) {
+        mDescription = description;
+    }
+
+    public Uri getCoverUri() {
+        return mCoverUri;
+    }
+
+    public void setCoverUri(Uri coverUri) {
+        mCoverUri = coverUri;
+    }
+
     @Override
     public int hashCode() {
         final int initial = 1051;
         final int multiplier = 571;
         return new HashCodeBuilder(initial, multiplier)
                 .append(this.mId)
+                .append(this.mTitle)
+                .append(this.mSubtitle)
+                .append(this.mDescription)
+                .append(this.mCoverUri)
                 .toHashCode();
     }
 
@@ -62,6 +120,10 @@ public class Book {
         Book that = ((Book) obj);
         return new EqualsBuilder()
                 .append(this.mId, that.mId)
+                .append(this.mTitle, that.mTitle)
+                .append(this.mSubtitle, that.mSubtitle)
+                .append(this.mDescription, that.mDescription)
+                .append(this.mCoverUri, that.mCoverUri)
                 .isEquals();
     }
 
@@ -69,6 +131,10 @@ public class Book {
     public String toString() {
         return new ToStringBuilder(this)
                 .append("mId", this.mId)
+                .append("mTitle", this.mTitle)
+                .append("mSubtitle", this.mSubtitle)
+                .append("mDescription", this.mDescription)
+                .append("mCoverUri", this.mCoverUri)
                 .toString();
     }
 
