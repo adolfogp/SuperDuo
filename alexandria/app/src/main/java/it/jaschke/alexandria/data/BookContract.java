@@ -32,12 +32,12 @@ public class BookContract {
     /**
      * Path for author data.
      */
-    public static final String PATH_AUTHOR = "author";
+    public static final String PATH_BOOK_AUTHOR = "author";
 
     /**
      * Path for the book categories.
      */
-    public static final String PATH_CATEGORY = "category";
+    public static final String PATH_BOOK_CATEGORY = "category";
 
     /**
      * Path for a book's complete data (including author, category, etc.).
@@ -112,6 +112,32 @@ public class BookContract {
         }
 
         /**
+         * Returns the URI for all the authors of a particular book,
+         * given the book's id.
+         *
+         * @param id the book's identifier (ISBN-13).
+         * @return the URI for all the authors of a particular book.
+         */
+        public static Uri buildBookAuthorsUri(long id) {
+            return CONTENT_URI.buildUpon()
+                    .appendPath(Long.toString(id))
+                    .appendPath(PATH_BOOK_AUTHOR).build();
+        }
+        /**
+         * Returns the URI for all the categories of a particular book,
+         * given the book's id.
+         *
+         * @param id the book's identifier (ISBN-13).
+         * @return the URI for all the categories of a particular book.
+         */
+        public static Uri buildBookCategoriesUri(long id) {
+            return CONTENT_URI.buildUpon()
+                    .appendPath(Long.toString(id))
+                    .appendPath(PATH_BOOK_CATEGORY).build();
+        }
+
+        // TODO: Delete evrything related to "full book"
+        /**
          * Returns the URI for a particular book's full data (including author,
          * category, etc.) given its id.
          *
@@ -135,19 +161,19 @@ public class BookContract {
         /**
          * Base URI for author data.
          */
-        public static final Uri CONTENT_URI = BASE_CONTENT_URI.buildUpon().appendPath(PATH_AUTHOR).build();
+        public static final Uri CONTENT_URI = BASE_CONTENT_URI.buildUpon().appendPath(PATH_BOOK_AUTHOR).build();
 
         /**
          * Type for {@code content:} URIs with directories of authors' data.
          */
         public static final String CONTENT_TYPE = ContentResolver.CURSOR_DIR_BASE_TYPE
-                + "/" + CONTENT_AUTHORITY + "/" + PATH_AUTHOR;
+                + "/" + CONTENT_AUTHORITY + "/" + PATH_BOOK_AUTHOR;
 
         /**
          * Type for {@code content:} URIs with a single author's data.
          */
         public static final String CONTENT_ITEM_TYPE = ContentResolver.CURSOR_ITEM_BASE_TYPE
-                + "/" + CONTENT_AUTHORITY + "/" + PATH_AUTHOR;
+                + "/" + CONTENT_AUTHORITY + "/" + PATH_BOOK_AUTHOR;
 
         /**
          * Name of the table containing author data.
@@ -155,9 +181,14 @@ public class BookContract {
         public static final String TABLE_NAME = "author";
 
         /**
+         * Identifier of the book related to this author.
+         */
+        public static final String COLUMN_BOOK_ID = "book_id";
+
+        /**
          * The author's name.
          */
-        public static final String AUTHOR = "name";
+        public static final String COLUMN_NAME = "name";
 
         /**
          * Returns the URI for a particular author review given its id.
@@ -182,25 +213,30 @@ public class BookContract {
          * Base URI for book category data.
          */
         public static final Uri CONTENT_URI =
-                BASE_CONTENT_URI.buildUpon().appendPath(PATH_CATEGORY).build();
+                BASE_CONTENT_URI.buildUpon().appendPath(PATH_BOOK_CATEGORY).build();
 
         /**
          * Type for {@code content:} URIs with directories of book categories
          * data.
          */
         public static final String CONTENT_TYPE = ContentResolver.CURSOR_DIR_BASE_TYPE
-                + "/" + CONTENT_AUTHORITY + "/" + PATH_CATEGORY;
+                + "/" + CONTENT_AUTHORITY + "/" + PATH_BOOK_CATEGORY;
 
         /**
          * Type for {@code content:} URIs with a single book category.
          */
         public static final String CONTENT_ITEM_TYPE = ContentResolver.CURSOR_ITEM_BASE_TYPE
-                + "/" + CONTENT_AUTHORITY + "/" + PATH_CATEGORY;
+                + "/" + CONTENT_AUTHORITY + "/" + PATH_BOOK_CATEGORY;
 
         /**
          * Name of the table containing book category data.
          */
         public static final String TABLE_NAME = "categories";
+
+        /**
+         * Identifier of the book related to this category.
+         */
+        public static final String COLUMN_BOOK_ID = "book_id";
 
         /**
          * The category's name.

@@ -2,7 +2,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools" tools:context=".MainActivity">
 
-    <item android:id="@+id/action_share"
+    <item android:id="@+id/menu_item_share"
           android:title="@string/action_share"
           app:showAsAction="always"
           app:actionProviderClass="android.support.v7.widget.ShareActionProvider" />

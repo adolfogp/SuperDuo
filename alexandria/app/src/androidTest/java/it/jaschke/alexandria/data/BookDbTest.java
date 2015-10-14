@@ -68,7 +68,7 @@ public class BookDbTest extends AndroidTestCase {
 
         columns = new String[]{
                 BookContract.AuthorEntry._ID,
-                BookContract.AuthorEntry.AUTHOR
+                BookContract.AuthorEntry.COLUMN_NAME
         };
 
         cursor = db.query(
@@ -139,7 +139,7 @@ public class BookDbTest extends AndroidTestCase {
 
         final ContentValues values= new ContentValues();
         values.put(BookContract.AuthorEntry._ID, ean);
-        values.put(BookContract.AuthorEntry.AUTHOR, author);
+        values.put(BookContract.AuthorEntry.COLUMN_NAME, author);
 
         return values;
     }
@@ -160,7 +160,7 @@ public class BookDbTest extends AndroidTestCase {
         values.put(BookContract.BookEntry.COLUMN_COVER_IMAGE_URL, imgUrl);
         values.put(BookContract.BookEntry.COLUMN_SUBTITLE, subtitle);
         values.put(BookContract.BookEntry.COLUMN_DESCRIPTION, desc);
-        values.put(BookContract.AuthorEntry.AUTHOR, author);
+        values.put(BookContract.AuthorEntry.COLUMN_NAME, author);
         values.put(BookContract.CategoryEntry.COLUMN_NAME, category);
         return values;
     }
@@ -170,7 +170,7 @@ public class BookDbTest extends AndroidTestCase {
         final ContentValues values= new ContentValues();
         values.put(BookContract.BookEntry.COLUMN_TITLE, title);
         values.put(BookContract.BookEntry.COLUMN_COVER_IMAGE_URL, imgUrl);
-        values.put(BookContract.AuthorEntry.AUTHOR, author);
+        values.put(BookContract.AuthorEntry.COLUMN_NAME, author);
         values.put(BookContract.CategoryEntry.COLUMN_NAME, category);
         return values;
     }

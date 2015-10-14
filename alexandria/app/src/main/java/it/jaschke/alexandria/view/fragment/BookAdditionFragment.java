@@ -182,7 +182,7 @@ public class BookAdditionFragment extends Fragment implements LoaderManager.Load
         String bookSubTitle = data.getString(data.getColumnIndex(BookContract.BookEntry.COLUMN_SUBTITLE));
         ((TextView) rootView.findViewById(R.id.bookSubTitle)).setText(bookSubTitle);
 
-        String authors = data.getString(data.getColumnIndex(BookContract.AuthorEntry.AUTHOR));
+        String authors = data.getString(data.getColumnIndex(BookContract.AuthorEntry.COLUMN_NAME));
         String[] authorsArr = authors.split(",");
         ((TextView) rootView.findViewById(R.id.authors)).setLines(authorsArr.length);
         ((TextView) rootView.findViewById(R.id.authors)).setText(authors.replace(",","\n"));

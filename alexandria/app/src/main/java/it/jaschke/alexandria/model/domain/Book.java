@@ -23,6 +23,8 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.parceler.Parcel;
 
+import java.util.List;
+
 /**
  * A book.
  *
@@ -55,6 +57,16 @@ public class Book {
      * URI of the book's cover image.
      */
     private Uri mCoverUri;
+
+    /**
+     * The book's authors.
+     */
+    private List<Author> mAuthors;
+
+    /**
+     * The book's categories.
+     */
+    private List<Category> mCategories;
 
     public long getId() {
         return mId;
@@ -94,6 +106,22 @@ public class Book {
 
     public void setCoverUri(Uri coverUri) {
         mCoverUri = coverUri;
+    }
+
+    public List<Author> getAuthors() {
+        return mAuthors;
+    }
+
+    public void setAuthors(List<Author> authors) {
+        this.mAuthors = authors;
+    }
+
+    public List<Category> getCategories() {
+        return mCategories;
+    }
+
+    public void setCategories(List<Category> categories) {
+        this.mCategories = categories;
     }
 
     @Override

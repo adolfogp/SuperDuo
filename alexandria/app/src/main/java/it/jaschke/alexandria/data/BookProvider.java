@@ -102,15 +102,15 @@ public class BookProvider extends ContentProvider {
         matcher.addURI(BookContract.CONTENT_AUTHORITY
                 , BookContract.PATH_BOOK +"/#", BOOK_ID);
         matcher.addURI(BookContract.CONTENT_AUTHORITY
-                , BookContract.PATH_AUTHOR +"/#", AUTHOR_ID);
+                , BookContract.PATH_BOOK_AUTHOR +"/#", AUTHOR_ID);
         matcher.addURI(BookContract.CONTENT_AUTHORITY
-                , BookContract.PATH_CATEGORY +"/#", CATEGORY_ID);
+                , BookContract.PATH_BOOK_CATEGORY +"/#", CATEGORY_ID);
         matcher.addURI(BookContract.CONTENT_AUTHORITY
                 , BookContract.PATH_BOOK, BOOK);
         matcher.addURI(BookContract.CONTENT_AUTHORITY
-                , BookContract.PATH_AUTHOR, AUTHOR);
+                , BookContract.PATH_BOOK_AUTHOR, AUTHOR);
         matcher.addURI(BookContract.CONTENT_AUTHORITY
-                , BookContract.PATH_CATEGORY, CATEGORY);
+                , BookContract.PATH_BOOK_CATEGORY, CATEGORY);
         matcher.addURI(BookContract.CONTENT_AUTHORITY
                 , BookContract.PATH_FULLBOOK +"/#", BOOK_FULLDETAIL);
         matcher.addURI(BookContract.CONTENT_AUTHORITY
@@ -206,7 +206,7 @@ public class BookProvider extends ContentProvider {
                         , BookEntry.TABLE_NAME + "." + BookEntry.COLUMN_COVER_IMAGE_URL
                         , BookEntry.TABLE_NAME + "." + BookEntry.COLUMN_DESCRIPTION
                         , "group_concat(DISTINCT " + AuthorEntry.TABLE_NAME + "."
-                                + AuthorEntry.AUTHOR +") as " + AuthorEntry.AUTHOR
+                                + AuthorEntry.COLUMN_NAME +") as " + AuthorEntry.COLUMN_NAME
                         , "group_concat(DISTINCT " + CategoryEntry.TABLE_NAME + "."
                                 + CategoryEntry.COLUMN_NAME +") as " + CategoryEntry.COLUMN_NAME
                 };
@@ -224,7 +224,7 @@ public class BookProvider extends ContentProvider {
                         BookEntry.TABLE_NAME + "." + BookEntry.COLUMN_TITLE
                         , BookEntry.TABLE_NAME + "." + BookEntry.COLUMN_COVER_IMAGE_URL
                         , "group_concat(DISTINCT " + AuthorEntry.TABLE_NAME + "."
-                                + AuthorEntry.AUTHOR + ") as " + AuthorEntry.AUTHOR
+                                + AuthorEntry.COLUMN_NAME + ") as " + AuthorEntry.COLUMN_NAME
                         , "group_concat(DISTINCT " + CategoryEntry.TABLE_NAME + "."
                                 + CategoryEntry.COLUMN_NAME +") as " + CategoryEntry.COLUMN_NAME
                 };

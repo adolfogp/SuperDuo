@@ -3,7 +3,6 @@ package it.jaschke.alexandria.data;
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
-import android.util.Log;
 
 import static it.jaschke.alexandria.data.BookContract.AuthorEntry;
 import static it.jaschke.alexandria.data.BookContract.BookEntry;
@@ -45,10 +44,13 @@ public class BookDbHelper extends SQLiteOpenHelper {
      */
     private static final String SQL_CREATE_AUTHOR_TABLE =
             "CREATE TABLE " + AuthorEntry.TABLE_NAME + " ("
-            + AuthorEntry._ID + " INTEGER,"
-            + AuthorEntry.AUTHOR + " TEXT,"
-            + " FOREIGN KEY (" + AuthorEntry._ID + ") REFERENCES "
+            + AuthorEntry._ID + "  INTEGER PRIMARY KEY, "
+            + AuthorEntry.COLUMN_BOOK_ID + "  INTEGER NOT NULL, "
+            + AuthorEntry.COLUMN_NAME + " TEXT,"
+            + " FOREIGN KEY (" + AuthorEntry.COLUMN_BOOK_ID + ") REFERENCES "
             + BookEntry.TABLE_NAME + " (" + BookEntry._ID + ")"
+            + "UNIQUE (" + AuthorEntry.COLUMN_BOOK_ID + ", "
+            + AuthorEntry.COLUMN_NAME + ") ON CONFLICT REPLACE"
             + ");";
 
     /**
@@ -56,10 +58,13 @@ public class BookDbHelper extends SQLiteOpenHelper {
      */
     private static final String SQL_CREATE_CATEGORY_TABLE =
             "CREATE TABLE " + CategoryEntry.TABLE_NAME + " ("
-            + CategoryEntry._ID + " INTEGER,"
+            + CategoryEntry._ID + "  INTEGER PRIMARY KEY, "
+            + CategoryEntry.COLUMN_BOOK_ID + "  INTEGER NOT NULL, "
             + CategoryEntry.COLUMN_NAME + " TEXT,"
-            + " FOREIGN KEY (" + CategoryEntry._ID + ") REFERENCES "
+            + " FOREIGN KEY (" + CategoryEntry.COLUMN_BOOK_ID + ") REFERENCES "
             + BookEntry.TABLE_NAME + " (" + BookEntry._ID + ")"
+            + "UNIQUE (" + CategoryEntry.COLUMN_BOOK_ID + ", "
+            + CategoryEntry.COLUMN_NAME + ") ON CONFLICT REPLACE"
             + ");";
 
     /**

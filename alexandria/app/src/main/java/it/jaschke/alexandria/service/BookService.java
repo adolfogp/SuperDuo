@@ -19,7 +19,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
 import java.net.URL;
 
 import it.jaschke.alexandria.model.domain.Book;
@@ -342,7 +341,7 @@ public class BookService extends IntentService {
         ContentValues values= new ContentValues();
         for (int i = 0; i < jsonArray.length(); i++) {
             values.put(BookContract.AuthorEntry._ID, id);
-            values.put(BookContract.AuthorEntry.AUTHOR, jsonArray.getString(i));
+            values.put(BookContract.AuthorEntry.COLUMN_NAME, jsonArray.getString(i));
             getContentResolver().insert(BookContract.AuthorEntry.CONTENT_URI, values);
             values= new ContentValues();
         }

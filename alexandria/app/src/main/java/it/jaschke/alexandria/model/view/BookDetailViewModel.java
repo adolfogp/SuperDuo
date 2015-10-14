@@ -18,16 +18,26 @@ package it.jaschke.alexandria.model.view;
 
 import android.database.Cursor;
 import android.databinding.BaseObservable;
+import android.databinding.Bindable;
 import android.net.Uri;
 import android.util.Log;
 
 import org.apache.commons.lang3.StringUtils;
 import org.parceler.Parcel;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
 import it.jaschke.alexandria.BR;
+import it.jaschke.alexandria.data.BookContract;
+import it.jaschke.alexandria.model.domain.Author;
 import it.jaschke.alexandria.model.domain.Book;
+import it.jaschke.alexandria.model.domain.Category;
 
 import static it.jaschke.alexandria.data.BookContract.BookEntry;
+import static it.jaschke.alexandria.data.BookContract.AuthorEntry;
+import static it.jaschke.alexandria.data.BookContract.CategoryEntry;
 
 /**
  * View model for the book detail view. Provides data and behaviour.
@@ -73,6 +83,50 @@ public class BookDetailViewModel extends BaseObservable {
     }
 
     /**
+     * Returns the title for the currently set {@link Book}, possibly
+     * {@code null}.
+     *
+     * @return the original title for the currently set {@link Book}, possibly
+     *     {@code null}.
+     */
+    @Bindable
+    public String getTitle() {
+        return mBook != null
+                ? mBook.getTitle()
+                : null;
+    }
+
+    /**
+     * Returns the book's {@link Author}s.
+     *
+     * @return the book's {@link Author}s.
+     */
+    @Bindable
+    public List<Author> getAuthors() {
+        if (mBook == null) {
+            return Collections.emptyList();
+        }
+        return mBook.getAuthors() != null
+                ? mBook.getAuthors()
+                : Collections.emptyList();
+    }
+
+    /**
+     * Returns the book's {@link Category} list.
+     *
+     * @return the book's {@link Category} list.
+     */
+    @Bindable
+    public List<Category> getCategories() {
+        if (mBook == null) {
+            return Collections.emptyList();
+        }
+        return mBook.getCategories() != null
+                ? mBook.getCategories()
+                : Collections.emptyList();
+    }
+
+    /**
      * Retrieves the data from the cursor passed as argument and sets it onto the
      * {@link BookDetailViewModel}'s current {@link Book}. The projection used
      * must be {@link BookDetailQuery#PROJECTION}. This method also notifies the
@@ -105,6 +159,106 @@ public class BookDetailViewModel extends BaseObservable {
         String coverUrl = cursor.getString(BookDetailQuery.COL_COVER_IMAGE_URL);
         mBook.setCoverUri(Uri.parse(StringUtils.trimToEmpty(coverUrl)));
         notifyPropertyChanged(BR._all);
+    }
+
+    /**
+     * Retrieves the data from the cursor passed as argument and sets it onto the
+     * {@link BookDetailViewModel}'s current {@link Book}. The projection used
+     * must be {@link BookAuthorQuery#PROJECTION}. This method
+     * also notifies the data binding of the change, so the visual elements can
+     * be updated.
+     *
+     * @param cursor the {@link Cursor} containing the data  to load.
+     * @throws IllegalStateException if there is no {@link Book} currently set
+     *     in the {@link BookDetailViewModel}.
+     */
+    public void setBookAuthorData(Cursor cursor) {
+        BookAuthorQuery n;
+        if (mBook == null) {
+            throw new IllegalStateException("No book currently set in BookDetailViewModel.");
+        }
+        if (cursor == null || !cursor.moveToFirst()) {
+            Log.d(LOG_TAG, "The cursor contains no authors.");
+            mBook.setAuthors(Collections.emptyList());
+            notifyPropertyChanged(BR.authors);
+            return;
+        }
+        List<Author> authors = new ArrayList<>();
+        do {
+            authors.add(newAuthor(cursor));
+        } while (cursor.moveToNext());
+        mBook.setAuthors(authors);
+        notifyPropertyChanged(BR.authors);
+    }
+
+    /**
+     * Returns a new instance of {@link Author} with the data of the touple
+     * currently pointed at by the {@link Cursor} passed as argument. The
+     * data of the cursor is expected to appear as in {@link BookAuthorQuery}.
+     *
+     * @param cursor the {@link Cursor} from which the data of the
+     *     {@link Author} will be retrieved.
+     * @return  a new instance of {@link Author} with the data of the touple
+     *     currently pointed at by the {@link Cursor} passed as argument.
+     */
+    private Author newAuthor(Cursor cursor) {
+        if (cursor == null) {
+            return null;
+        }
+        Author author = new Author();
+        author.setId(cursor.getLong(BookAuthorQuery.COL_ID));
+        author.setName(cursor.getString(BookAuthorQuery.COL_NAME));
+        return author;
+    }
+
+    /**
+     * Retrieves the data from the cursor passed as argument and sets it onto the
+     * {@link BookDetailViewModel}'s current {@link Book}. The projection used
+     * must be {@link BookCategoryQuery#PROJECTION}. This method
+     * also notifies the data binding of the change, so the visual elements can
+     * be updated.
+     *
+     * @param cursor the {@link Cursor} containing the data  to load.
+     * @throws IllegalStateException if there is no {@link Book} currently set
+     *     in the {@link BookDetailViewModel}.
+     */
+    public void setBookCategoryData(Cursor cursor) {
+        BookAuthorQuery n;
+        if (mBook == null) {
+            throw new IllegalStateException("No book currently set in BookDetailViewModel.");
+        }
+        if (cursor == null || !cursor.moveToFirst()) {
+            Log.d(LOG_TAG, "The cursor contains no categories.");
+            mBook.setCategories(Collections.emptyList());
+            notifyPropertyChanged(BR.authors);
+            return;
+        }
+        List<Category> categories = new ArrayList<>();
+        do {
+            categories.add(newCategory(cursor));
+        } while (cursor.moveToNext());
+        mBook.setCategories(categories);
+        notifyPropertyChanged(BR.categories);
+    }
+
+    /**
+     * Returns a new instance of {@link Category} with the data of the touple
+     * currently pointed at by the {@link Cursor} passed as argument. The
+     * data of the cursor is expected to appear as in {@link BookCategoryQuery}.
+     *
+     * @param cursor the {@link Cursor} from which the data of the
+     *     {@link Category} will be retrieved.
+     * @return  a new instance of {@link Category} with the data of the touple
+     *     currently pointed at by the {@link Cursor} passed as argument.
+     */
+    private Category newCategory(Cursor cursor) {
+        if (cursor == null) {
+            return null;
+        }
+        Category author = new Category();
+        author.setId(cursor.getLong(BookCategoryQuery.COL_ID));
+        author.setName(cursor.getString(BookCategoryQuery.COL_NAME));
+        return author;
     }
 
     /**
@@ -157,6 +311,104 @@ public class BookDetailViewModel extends BaseObservable {
         private BookDetailQuery() {
             // Empty constructor
         }
+    }
+
+    /**
+     * Provides information about projection and column indices expected by
+     * {@link BookDetailViewModel} when setting book authors from a
+     * {@link Cursor}.
+     */
+    public static final class BookAuthorQuery {
+
+        /**
+         * Projection that includes the details of the book authors.
+         * Used to query {@link it.jaschke.alexandria.data.BookProvider}.
+         */
+        public static final String[] PROJECTION = {
+                AuthorEntry._ID,
+                AuthorEntry.COLUMN_BOOK_ID,
+                AuthorEntry.COLUMN_NAME,
+        };
+
+        /**
+         * Sort order to be used in the query. Considers the local id of
+         * the authors, in ascending order.
+         */
+        public static final String SORT_ORDER = AuthorEntry._ID + " ASC";
+
+        /**
+         * Index of {@link AuthorEntry#_ID} in {@link #PROJECTION}.
+         */
+        public static final int COL_ID = 0;
+
+        /**
+         * Index of {@link AuthorEntry#COLUMN_BOOK_ID} in
+         * {@link #PROJECTION}.
+         */
+        public static final int COL_BOOK_ID = 1;
+
+        /**
+         * Index of {@link AuthorEntry#COLUMN_NAME} in
+         * {@link #PROJECTION}.
+         */
+        public static final int COL_NAME = 2;
+
+        /**
+         * The class only provides constants and utility methods.
+         */
+        private BookAuthorQuery() {
+            // Empty constructor
+        }
+
+    }
+
+    /**
+     * Provides information about projection and column indices expected by
+     * {@link BookDetailViewModel} when setting book categories from a
+     * {@link Cursor}.
+     */
+    public static final class BookCategoryQuery {
+
+        /**
+         * Projection that includes the details of the book categories.
+         * Used to query {@link it.jaschke.alexandria.data.BookProvider}.
+         */
+        public static final String[] PROJECTION = {
+                CategoryEntry._ID,
+                CategoryEntry.COLUMN_BOOK_ID,
+                CategoryEntry.COLUMN_NAME,
+        };
+
+        /**
+         * Sort order to be used in the query. Considers the local id of
+         * the authors, in ascending order.
+         */
+        public static final String SORT_ORDER = AuthorEntry._ID + " ASC";
+
+        /**
+         * Index of {@link AuthorEntry#_ID} in {@link #PROJECTION}.
+         */
+        public static final int COL_ID = 0;
+
+        /**
+         * Index of {@link AuthorEntry#COLUMN_BOOK_ID} in
+         * {@link #PROJECTION}.
+         */
+        public static final int COL_BOOK_ID = 1;
+
+        /**
+         * Index of {@link AuthorEntry#COLUMN_NAME} in
+         * {@link #PROJECTION}.
+         */
+        public static final int COL_NAME = 2;
+
+        /**
+         * The class only provides constants and utility methods.
+         */
+        private BookCategoryQuery() {
+            // Empty constructor
+        }
+
     }
 
 }
