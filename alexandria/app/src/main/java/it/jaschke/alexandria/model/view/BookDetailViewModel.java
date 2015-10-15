@@ -30,7 +30,6 @@ import java.util.Collections;
 import java.util.List;
 
 import it.jaschke.alexandria.BR;
-import it.jaschke.alexandria.data.BookContract;
 import it.jaschke.alexandria.model.domain.Author;
 import it.jaschke.alexandria.model.domain.Book;
 import it.jaschke.alexandria.model.domain.Category;
@@ -86,13 +85,27 @@ public class BookDetailViewModel extends BaseObservable {
      * Returns the title for the currently set {@link Book}, possibly
      * {@code null}.
      *
-     * @return the original title for the currently set {@link Book}, possibly
+     * @return the title for the currently set {@link Book}, possibly
      *     {@code null}.
      */
     @Bindable
     public String getTitle() {
         return mBook != null
                 ? mBook.getTitle()
+                : null;
+    }
+
+    /**
+     * Returns the subtitle for the currently set {@link Book}, possibly
+     * {@code null}.
+     *
+     * @return the title for the currently set {@link Book}, possibly
+     *     {@code null}.
+     */
+    @Bindable
+    public String getSubtitle() {
+        return mBook != null
+                ? mBook.getSubtitle()
                 : null;
     }
 
@@ -173,7 +186,6 @@ public class BookDetailViewModel extends BaseObservable {
      *     in the {@link BookDetailViewModel}.
      */
     public void setBookAuthorData(Cursor cursor) {
-        BookAuthorQuery n;
         if (mBook == null) {
             throw new IllegalStateException("No book currently set in BookDetailViewModel.");
         }
@@ -223,7 +235,6 @@ public class BookDetailViewModel extends BaseObservable {
      *     in the {@link BookDetailViewModel}.
      */
     public void setBookCategoryData(Cursor cursor) {
-        BookAuthorQuery n;
         if (mBook == null) {
             throw new IllegalStateException("No book currently set in BookDetailViewModel.");
         }

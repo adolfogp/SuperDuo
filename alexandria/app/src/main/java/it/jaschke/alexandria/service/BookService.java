@@ -340,7 +340,7 @@ public class BookService extends IntentService {
     private void insertAuthors(long id, JSONArray jsonArray) throws JSONException {
         ContentValues values= new ContentValues();
         for (int i = 0; i < jsonArray.length(); i++) {
-            values.put(BookContract.AuthorEntry._ID, id);
+            values.put(BookContract.AuthorEntry.COLUMN_BOOK_ID, id);
             values.put(BookContract.AuthorEntry.COLUMN_NAME, jsonArray.getString(i));
             getContentResolver().insert(BookContract.AuthorEntry.CONTENT_URI, values);
             values= new ContentValues();
@@ -357,7 +357,7 @@ public class BookService extends IntentService {
     private void insertCategories(long id, JSONArray jsonArray) throws JSONException {
         ContentValues values= new ContentValues();
         for (int i = 0; i < jsonArray.length(); i++) {
-            values.put(BookContract.CategoryEntry._ID, id);
+            values.put(BookContract.CategoryEntry.COLUMN_BOOK_ID, id);
             values.put(BookContract.CategoryEntry.COLUMN_NAME, jsonArray.getString(i));
             getContentResolver().insert(BookContract.CategoryEntry.CONTENT_URI, values);
             values= new ContentValues();

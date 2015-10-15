@@ -28,6 +28,7 @@
                 android:layout_alignParentTop="true"
                 android:layout_margin="10dp"
                 android:paddingRight="20dp"
+                android:text="@{viewModel.title}"
                 tools:text="Book Title Goes Here"
                 android:textIsSelectable="true"
                 android:textSize="@dimen/head_line"
@@ -57,6 +58,7 @@
                 android:ellipsize="end"
                 android:maxLines="5"
                 android:textSize="18sp"
+                android:text="@{viewModel.subtitle}"
                 tools:text="Book Subtitle Goes Here"/>
 
             <TextView

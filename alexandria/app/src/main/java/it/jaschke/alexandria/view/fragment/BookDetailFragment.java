@@ -224,8 +224,6 @@ public class BookDetailFragment extends Fragment {
         return intent;
     }
 
-    // TODO: Continue from here.
-
     /**
      * Handles the callbacks for the {@link Loader} that retrieves the book's
      * details from the {@code ContentProvider}. When loading is finished,

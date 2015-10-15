@@ -67,7 +67,7 @@ public class BookDbTest extends AndroidTestCase {
         retEan = db.insert(BookContract.AuthorEntry.TABLE_NAME, null, values);
 
         columns = new String[]{
-                BookContract.AuthorEntry._ID,
+                BookContract.AuthorEntry.COLUMN_BOOK_ID,
                 BookContract.AuthorEntry.COLUMN_NAME
         };
 
@@ -88,7 +88,7 @@ public class BookDbTest extends AndroidTestCase {
         retEan = db.insert(BookContract.CategoryEntry.TABLE_NAME, null, values);
 
         columns = new String[]{
-                BookContract.CategoryEntry._ID,
+                BookContract.CategoryEntry.COLUMN_BOOK_ID,
                 BookContract.CategoryEntry.COLUMN_NAME
         };
 
@@ -138,7 +138,7 @@ public class BookDbTest extends AndroidTestCase {
     public static ContentValues getAuthorValues() {
 
         final ContentValues values= new ContentValues();
-        values.put(BookContract.AuthorEntry._ID, ean);
+        values.put(BookContract.AuthorEntry.COLUMN_BOOK_ID, ean);
         values.put(BookContract.AuthorEntry.COLUMN_NAME, author);
 
         return values;
@@ -147,7 +147,7 @@ public class BookDbTest extends AndroidTestCase {
     public static ContentValues getCategoryValues() {
 
         final ContentValues values= new ContentValues();
-        values.put(BookContract.CategoryEntry._ID, ean);
+        values.put(BookContract.CategoryEntry.COLUMN_BOOK_ID, ean);
         values.put(BookContract.CategoryEntry.COLUMN_NAME, category);
 
         return values;

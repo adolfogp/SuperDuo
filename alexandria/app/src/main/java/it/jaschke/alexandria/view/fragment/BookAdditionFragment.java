@@ -162,7 +162,8 @@ public class BookAdditionFragment extends Fragment implements LoaderManager.Load
         }
         return new CursorLoader(
                 getActivity(),
-                BookContract.BookEntry.buildFullBookUri(Long.parseLong(eanStr)), // TODO: Handle exception
+                null,
+//                BookContract.BookEntry.buildFullBookUri(Long.parseLong(eanStr)), // TODO: Handle exception
                 null,
                 null,
                 null,

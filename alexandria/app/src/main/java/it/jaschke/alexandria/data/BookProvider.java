@@ -9,6 +9,9 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteQueryBuilder;
 import android.net.Uri;
 
+import it.jaschke.alexandria.model.domain.Author;
+import it.jaschke.alexandria.model.domain.Category;
+
 import static it.jaschke.alexandria.data.BookContract.BookEntry;
 import static it.jaschke.alexandria.data.BookContract.AuthorEntry;
 import static it.jaschke.alexandria.data.BookContract.CategoryEntry;
@@ -22,70 +25,119 @@ import static it.jaschke.alexandria.data.BookContract.CategoryEntry;
 public class BookProvider extends ContentProvider {
 
     /**
-     * Identifies a query for a single book's basic information, by its id.
-     */
-    private static final int BOOK_ID = 100;
-
-    /**
      * Identifies a query for basic book information.
      */
-    private static final int BOOK = 101;
+    private static final int BOOK = 100;
 
     /**
-     * Identifies a query for an author by its id.
+     * Identifies a query for a single book's basic information, by its id.
      */
-    private static final int AUTHOR_ID = 200;
+    private static final int BOOK_ID = 110;
 
     /**
      * Identifies a query for author information.
      */
-    private static final int AUTHOR = 201;
+    private static final int AUTHOR = 200;
+
+    /**
+     * Identifies a query for an author by its id.
+     */
+    private static final int AUTHOR_ID = 210;
+
+    /**
+     * Identifies a query for the authors of a specific book, by the
+     * book's identifier (ISBN-13).
+     */
+    private static final int BOOK_AUTHOR = 220;
+
+    /**
+     * Identifies a query for book category information.
+     */
+    private static final int CATEGORY = 300;
 
     /**
      * Identifies a query for the information of a single category of books,
      * by its id.
      */
-    private static final int CATEGORY_ID = 300;
+    private static final int CATEGORY_ID = 310;
 
     /**
-     * Identifies a query for book category information.
+     * Identifies a query for the categories of a specific book, by the
+     * book's identifier (ISBN-13).
      */
-    private static final int CATEGORY = 301;
+    private static final int BOOK_CATEGORY = 320;
 
     /**
-     * Identifies a query for full book data that does not include some details
-     * like the subtitle.
+     * Selection for a book queried by id.
      */
-    private static final int BOOK_FULL = 500;
+    private static final String SELECTION_BOOK_ID =
+            BookEntry.TABLE_NAME + "." + BookEntry._ID + " = ? ";
 
     /**
-     * Identifies a query for all the data available for a single book.
+     * Selection for an author queried by id.
      */
-    private static final int BOOK_FULLDETAIL = 501;
+    private static final String SELECTION_AUTHOR_ID =
+            AuthorEntry.TABLE_NAME + "." + AuthorEntry._ID + " = ? ";
+
+    /**
+     * Selection for a category queried by id.
+     */
+    private static final String SELECTION_CATEGORY_ID =
+            CategoryEntry.TABLE_NAME + "." + CategoryEntry._ID + " = ? ";
+
+    /**
+     * Selection for the authors of a specific book, queried by the
+     * book's identifier.
+     */
+    private static final String SELECTION_BOOK_AUTHORS =
+            AuthorEntry.TABLE_NAME + "." + AuthorEntry.COLUMN_BOOK_ID + " = ? ";
+
+    /**
+     * Selection for the authors of a specific book, queried by the
+     * book's identifier.
+     */
+    private static final String SELECTION_BOOK_CATEGORIES =
+            CategoryEntry.TABLE_NAME + "." + CategoryEntry.COLUMN_BOOK_ID + " = ? ";
 
     /**
      * Used to match URIs to queries and their result type.
      */
-    private static final UriMatcher uriMatcher = buildUriMatcher();
+    private static UriMatcher sUriMatcher = buildUriMatcher();
 
     /**
      * Used to get access the database holding the data.
      */
-    private BookDbHelper dbHelper;
+    private BookDbHelper mOpenHelper;
 
     /**
-     * Used to query for detailed book data.
+     * Used to query book data.
      */
-    private static final SQLiteQueryBuilder bookFull;
+    private static SQLiteQueryBuilder sBookQueryBuilder;
 
-    static{
-        bookFull = new SQLiteQueryBuilder();
-        bookFull.setTables(BookEntry.TABLE_NAME + " LEFT OUTER JOIN "
-                + AuthorEntry.TABLE_NAME + " USING (" + BookEntry._ID + ")"
-                + " LEFT OUTER JOIN " +  CategoryEntry.TABLE_NAME
-                + " USING (" + BookEntry._ID + ")");
+    static {
+        sBookQueryBuilder = new SQLiteQueryBuilder();
+        sBookQueryBuilder.setTables(BookEntry.TABLE_NAME);
     }
 
+    /**
+     * Used to query author data.
+     */
+    private static SQLiteQueryBuilder sAuthorQueryBuilder;
+
+    static {
+        sAuthorQueryBuilder = new SQLiteQueryBuilder();
+        sAuthorQueryBuilder.setTables(AuthorEntry.TABLE_NAME);
+    }
+
+    /**
+     * Used to query category data.
+     */
+    private static SQLiteQueryBuilder sCategoryQueryBuilder;
+
+    static {
+        sCategoryQueryBuilder = new SQLiteQueryBuilder();
+        sCategoryQueryBuilder.setTables(CategoryEntry.TABLE_NAME);
+    }
 
     /**
      * Returns a new instance of {@link UriMatcher} that maps URIs to the
@@ -98,7 +150,7 @@ public class BookProvider extends ContentProvider {
      * @see #AUTHOR_ID
      */
     private static UriMatcher buildUriMatcher() {
-        final UriMatcher matcher = new UriMatcher(UriMatcher.NO_MATCH);
+        UriMatcher matcher = new UriMatcher(UriMatcher.NO_MATCH);
         matcher.addURI(BookContract.CONTENT_AUTHORITY
                 , BookContract.PATH_BOOK +"/#", BOOK_ID);
         matcher.addURI(BookContract.CONTENT_AUTHORITY
@@ -112,17 +164,43 @@ public class BookProvider extends ContentProvider {
         matcher.addURI(BookContract.CONTENT_AUTHORITY
                 , BookContract.PATH_BOOK_CATEGORY, CATEGORY);
         matcher.addURI(BookContract.CONTENT_AUTHORITY
-                , BookContract.PATH_FULLBOOK +"/#", BOOK_FULLDETAIL);
+                , BookContract.PATH_BOOK + "/#/" + BookContract.PATH_BOOK_AUTHOR
+                , BookProvider.BOOK_AUTHOR);
         matcher.addURI(BookContract.CONTENT_AUTHORITY
-                , BookContract.PATH_FULLBOOK, BOOK_FULL);
+                , BookContract.PATH_BOOK + "/#/" + BookContract.PATH_BOOK_CATEGORY
+                , BookProvider.BOOK_CATEGORY);
         return matcher;
     }
 
     @Override
     public boolean onCreate() {
-        dbHelper = new BookDbHelper(getContext());
+        mOpenHelper = new BookDbHelper(getContext());
         return true;
 
+    }
+
+    @Override
+    public String getType(Uri uri) {
+        switch (sUriMatcher.match(uri)) {
+            case BOOK:
+                return BookEntry.CONTENT_TYPE;
+            case BOOK_ID:
+                return BookEntry.CONTENT_ITEM_TYPE;
+            case AUTHOR:
+                return AuthorEntry.CONTENT_TYPE;
+            case AUTHOR_ID:
+                return AuthorEntry.CONTENT_ITEM_TYPE;
+            case CATEGORY:
+                return CategoryEntry.CONTENT_TYPE;
+            case CATEGORY_ID:
+                return CategoryEntry.CONTENT_ITEM_TYPE;
+            case BOOK_AUTHOR:
+                return AuthorEntry.CONTENT_TYPE;
+            case BOOK_CATEGORY:
+                return CategoryEntry.CONTENT_TYPE;
+            default:
+                throw new UnsupportedOperationException("Unknown uri: " + uri);
+        }
     }
 
     @Override
@@ -132,109 +210,30 @@ public class BookProvider extends ContentProvider {
             , String[] selectionArgs
             , String sortOrder) {
         Cursor retCursor;
-        switch (uriMatcher.match(uri)) {
+        switch (sUriMatcher.match(uri)) {
             case BOOK:
-                retCursor=dbHelper.getReadableDatabase().query(
-                        BookEntry.TABLE_NAME,
-                        projection,
-                        selection,
-                        selection==null? null : selectionArgs,
-                        null,
-                        null,
-                        sortOrder
-                );
-                break;
-            case AUTHOR:
-                retCursor=dbHelper.getReadableDatabase().query(
-                        AuthorEntry.TABLE_NAME,
-                        projection,
-                        selection,
-                        selectionArgs,
-                        null,
-                        null,
-                        sortOrder
-                );
-                break;
-            case CATEGORY:
-                retCursor=dbHelper.getReadableDatabase().query(
-                        CategoryEntry.TABLE_NAME,
-                        projection,
-                        selection,
-                        selectionArgs,
-                        null,
-                        null,
-                        sortOrder
-                );
+                retCursor = getAllBooks(projection, selection, selectionArgs, sortOrder);
                 break;
             case BOOK_ID:
-                retCursor=dbHelper.getReadableDatabase().query(
-                        BookEntry.TABLE_NAME,
-                        projection,
-                        BookEntry._ID + " = '" + ContentUris.parseId(uri) + "'",
-                        selectionArgs,
-                        null,
-                        null,
-                        sortOrder
-                );
+                retCursor = getBookById(uri, projection);
+                break;
+            case AUTHOR:
+                retCursor = getAllAuthors(projection, selection, selectionArgs, sortOrder);
                 break;
             case AUTHOR_ID:
-                retCursor=dbHelper.getReadableDatabase().query(
-                        AuthorEntry.TABLE_NAME,
-                        projection,
-                        AuthorEntry._ID + " = '" + ContentUris.parseId(uri) + "'",
-                        selectionArgs,
-                        null,
-                        null,
-                        sortOrder
-                );
+                retCursor = getAuthorById(uri, projection);
+                break;
+            case CATEGORY:
+                retCursor = getAllCategories(projection, selection, selectionArgs, sortOrder);
                 break;
             case CATEGORY_ID:
-                retCursor=dbHelper.getReadableDatabase().query(
-                        CategoryEntry.TABLE_NAME,
-                        projection,
-                        CategoryEntry._ID + " = '" + ContentUris.parseId(uri) + "'",
-                        selectionArgs,
-                        null,
-                        null,
-                        sortOrder
-                );
+                retCursor = getCategoryById(uri, projection);
                 break;
-            case BOOK_FULLDETAIL:
-                String[] bfd_projection = {
-                        BookEntry.TABLE_NAME + "." + BookEntry.COLUMN_TITLE
-                        , BookEntry.TABLE_NAME + "." + BookEntry.COLUMN_SUBTITLE
-                        , BookEntry.TABLE_NAME + "." + BookEntry.COLUMN_COVER_IMAGE_URL
-                        , BookEntry.TABLE_NAME + "." + BookEntry.COLUMN_DESCRIPTION
-                        , "group_concat(DISTINCT " + AuthorEntry.TABLE_NAME + "."
-                                + AuthorEntry.COLUMN_NAME +") as " + AuthorEntry.COLUMN_NAME
-                        , "group_concat(DISTINCT " + CategoryEntry.TABLE_NAME + "."
-                                + CategoryEntry.COLUMN_NAME +") as " + CategoryEntry.COLUMN_NAME
-                };
-                retCursor = bookFull.query(dbHelper.getReadableDatabase()
-                        , bfd_projection
-                        , BookEntry.TABLE_NAME + "." + BookEntry._ID
-                                + " = '" + ContentUris.parseId(uri) + "'"
-                        , selectionArgs
-                        , BookEntry.TABLE_NAME + "." + BookEntry._ID
-                        , null
-                        , sortOrder);
+            case BOOK_AUTHOR:
+                retCursor = getBookAuthors(uri, projection);
                 break;
-            case BOOK_FULL:
-                String[] bf_projection = {
-                        BookEntry.TABLE_NAME + "." + BookEntry.COLUMN_TITLE
-                        , BookEntry.TABLE_NAME + "." + BookEntry.COLUMN_COVER_IMAGE_URL
-                        , "group_concat(DISTINCT " + AuthorEntry.TABLE_NAME + "."
-                                + AuthorEntry.COLUMN_NAME + ") as " + AuthorEntry.COLUMN_NAME
-                        , "group_concat(DISTINCT " + CategoryEntry.TABLE_NAME + "."
-                                + CategoryEntry.COLUMN_NAME +") as " + CategoryEntry.COLUMN_NAME
-                };
-                retCursor = bookFull.query(dbHelper.getReadableDatabase()
-                        , bf_projection
-                        , null
-                        , selectionArgs
-                        , BookContract.BookEntry.TABLE_NAME + "." + BookContract.BookEntry._ID
-                        , null
-                        , sortOrder);
+            case BOOK_CATEGORY:
+                retCursor = getBookCategories(uri, projection);
                 break;
             default:
                 throw new UnsupportedOperationException("Unknown uri: " + uri);
@@ -243,134 +242,277 @@ public class BookProvider extends ContentProvider {
         return retCursor;
     }
 
+    /**
+     * Queries the database for all registered books.
+     *
+     * @param projection the columns to return.
+     * @param selection the <i>WHERE</i> clause.
+     * @param selectionArgs the values for the arguments used in {@code selection}.
+     * @param sortOrder how the rows sould be ordered.
+     * @return a {@link Cursor} for the result.
+     */
+    private Cursor getAllBooks(String[] projection
+            , String selection
+            , String[] selectionArgs
+            , String sortOrder) {
+        return sBookQueryBuilder.query(
+                mOpenHelper.getReadableDatabase()
+                , projection
+                , selection
+                , selectionArgs
+                , null // groupBy
+                , null // having
+                , sortOrder);
+    }
 
+    /**
+     * Queries the database for the book with the id contained in the URI.
+     *
+     * @param uri the URI used to query, containing the id of the book.
+     * @param projection the columns to return.
+     * @return a {@link Cursor} for the result.
+     */
+    private Cursor getBookById(Uri uri, String[] projection) {
+        String id = Long.toString(ContentUris.parseId(uri));
+        return sBookQueryBuilder.query(
+                mOpenHelper.getReadableDatabase()
+                , projection
+                , SELECTION_BOOK_ID // selection
+                , new String[] {id}  // selectionArgs
+                , null // groupBy
+                , null // having
+                , null  // sortOrder
+        );
+    }
 
-    @Override
-    public String getType(Uri uri) {
-        switch (uriMatcher.match(uri)) {
-            case BOOK_FULLDETAIL:
-                return BookEntry.CONTENT_ITEM_TYPE;
-            case BOOK_ID:
-                return BookEntry.CONTENT_ITEM_TYPE;
-            case AUTHOR_ID:
-                return AuthorEntry.CONTENT_ITEM_TYPE;
-            case CATEGORY_ID:
-                return CategoryEntry.CONTENT_ITEM_TYPE;
-            case BOOK:
-                return BookEntry.CONTENT_TYPE;
-            case AUTHOR:
-                return AuthorEntry.CONTENT_TYPE;
-            case CATEGORY:
-                return CategoryEntry.CONTENT_TYPE;
-            default:
-                throw new UnsupportedOperationException("Unknown uri: " + uri);
-        }
+    /**
+     * Queries the database for all registered authors.
+     *
+     * @param projection the columns to return.
+     * @param selection the <i>WHERE</i> clause.
+     * @param selectionArgs the values for the arguments used in {@code selection}.
+     * @param sortOrder how the rows sould be ordered.
+     * @return a {@link Cursor} for the result.
+     */
+    private Cursor getAllAuthors(String[] projection
+            , String selection
+            , String[] selectionArgs
+            , String sortOrder) {
+        return sAuthorQueryBuilder.query(
+                mOpenHelper.getReadableDatabase()
+                , projection
+                , selection
+                , selectionArgs
+                , null // groupBy
+                , null // having
+                , sortOrder);
+    }
+
+    /**
+     * Queries the database for the author with the id contained in the URI.
+     *
+     * @param uri the URI used to query, containing the id of the author.
+     * @param projection the columns to return.
+     * @return a {@link Cursor} for the result.
+     */
+    private Cursor getAuthorById(Uri uri, String[] projection) {
+        String id = Long.toString(ContentUris.parseId(uri));
+        return sAuthorQueryBuilder.query(
+                mOpenHelper.getReadableDatabase()
+                , projection
+                , SELECTION_AUTHOR_ID // selection
+                , new String[] {id}  // selectionArgs
+                , null // groupBy
+                , null // having
+                , null  // sortOrder
+        );
+    }
+
+    /**
+     * Queries the database for all registered book categories.
+     *
+     * @param projection the columns to return.
+     * @param selection the <i>WHERE</i> clause.
+     * @param selectionArgs the values for the arguments used in {@code selection}.
+     * @param sortOrder how the rows sould be ordered.
+     * @return a {@link Cursor} for the result.
+     */
+    private Cursor getAllCategories(String[] projection
+            , String selection
+            , String[] selectionArgs
+            , String sortOrder) {
+        return sCategoryQueryBuilder.query(
+                mOpenHelper.getReadableDatabase()
+                , projection
+                , selection
+                , selectionArgs
+                , null // groupBy
+                , null // having
+                , sortOrder);
+    }
+
+    /**
+     * Queries the database for the category with the id contained in the URI.
+     *
+     * @param uri the URI used to query, containing the id of the category.
+     * @param projection the columns to return.
+     * @return a {@link Cursor} for the result.
+     */
+    private Cursor getCategoryById(Uri uri, String[] projection) {
+        String id = Long.toString(ContentUris.parseId(uri));
+        return sCategoryQueryBuilder.query(
+                mOpenHelper.getReadableDatabase()
+                , projection
+                , SELECTION_CATEGORY_ID // selection
+                , new String[] {id}  // selectionArgs
+                , null // groupBy
+                , null // having
+                , null  // sortOrder
+        );
+    }
+
+    /**
+     * Queries the database for all the authors related to a book with the
+     * book's id contained in the URI.
+     *
+     * @param uri the URI used to query, containing the id of the book.
+     * @param projection the columns to return.
+     * @return a {@link Cursor} for the result.
+     */
+    private Cursor getBookAuthors(Uri uri, String[] projection) {
+        String id = Long.toString(BookEntry.getBookIdFromUri(uri));
+        return sAuthorQueryBuilder.query(
+                mOpenHelper.getReadableDatabase()
+                , projection
+                , SELECTION_BOOK_AUTHORS
+                , new String[] {id}
+                , null // groupBy
+                , null // having
+                , null  // sortOrder
+        );
+    }
+
+    /**
+     * Queries the database for all the categories related to a book with the
+     * book's id contained in the URI.
+     *
+     * @param uri the URI used to query, containing the id of the book.
+     * @param projection the columns to return.
+     * @return a {@link Cursor} for the result.
+     */
+    private Cursor getBookCategories(Uri uri, String[] projection) {
+        String id = Long.toString(BookEntry.getBookIdFromUri(uri));
+        return sCategoryQueryBuilder.query(
+                mOpenHelper.getReadableDatabase()
+                , projection
+                , SELECTION_BOOK_CATEGORIES
+                , new String[] {id}
+                , null // groupBy
+                , null // having
+                , null  // sortOrder
+        );
     }
 
     @Override
     public Uri insert(Uri uri, ContentValues values) {
-        final SQLiteDatabase db = dbHelper.getWritableDatabase();
-        Uri returnUri;
-        switch (uriMatcher.match(uri)) {
-            case BOOK: {
-                long id = db.insert(BookContract.BookEntry.TABLE_NAME, null, values);
+        final SQLiteDatabase db = mOpenHelper.getWritableDatabase();
+        Uri resultUri;
+        switch (sUriMatcher.match(uri)) {
+            case BOOK:
+                long id = db.insert(BookEntry.TABLE_NAME, null, values);
                 if (id > 0) {
-                    returnUri = BookContract.BookEntry.buildBookUri(id);
+                    resultUri = BookEntry.buildBookUri(id);
                 } else {
-                    throw new android.database.SQLException("Failed to insert row into " + uri);
-                }
-                getContext().getContentResolver().notifyChange(
-                        BookContract.BookEntry.buildFullBookUri(id), null);
-                break;
-            }
-            case AUTHOR:{
-                long id = db.insert(BookContract.AuthorEntry.TABLE_NAME, null, values);
-                if (id > 0) {
-                    returnUri = BookContract.AuthorEntry.buildAuthorUri(values.getAsLong("_id"));
-                } else {
-                    throw new android.database.SQLException("Failed to insert row into " + uri);
+                    throw new android.database.SQLException("Insertion failed. " + uri);
                 }
                 break;
-            }
-            case CATEGORY: {
-                long id = db.insert(BookContract.CategoryEntry.TABLE_NAME, null, values);
+            case AUTHOR:
+                id = db.insert(AuthorEntry.TABLE_NAME, null, values);
                 if (id > 0) {
-                    returnUri = BookContract.CategoryEntry.buildCategoryUri(values.getAsLong("_id"));
+                    resultUri = AuthorEntry.buildAuthorUri(id);
                 } else {
-                    throw new android.database.SQLException("Failed to insert row into " + uri);
+                    throw new android.database.SQLException("Insertion failed. " + uri);
                 }
                 break;
-            }
+            case CATEGORY:
+                id = db.insert(CategoryEntry.TABLE_NAME, null, values);
+                if (id > 0) {
+                    resultUri = CategoryEntry.buildCategoryUri(id);
+                } else {
+                    throw new android.database.SQLException("Insertion failed. " + uri);
+                }
+                break;
             default:
-                throw new UnsupportedOperationException("Unknown uri: " + uri);
+                throw new UnsupportedOperationException("Unknown: " + uri);
         }
-        return returnUri;
+        getContext().getContentResolver().notifyChange(uri, null);
+        return resultUri;
+    }
+
+    @Override
+    public int update(Uri uri
+            , ContentValues values
+            , String selection
+            , String[] selectionArgs) {
+        final SQLiteDatabase db = mOpenHelper.getWritableDatabase();
+        int rowsAffected;
+        switch (sUriMatcher.match(uri)) {
+            case BOOK:
+                rowsAffected =
+                        db.update(BookEntry.TABLE_NAME
+                                , values, selection, selectionArgs);
+                break;
+            case AUTHOR:
+                rowsAffected =
+                        db.update(AuthorEntry.TABLE_NAME
+                                , values, selection, selectionArgs);
+                break;
+            case CATEGORY:
+                rowsAffected =
+                        db.update(CategoryEntry.TABLE_NAME
+                                , values, selection, selectionArgs);
+                break;
+            default:
+                throw new UnsupportedOperationException("Unknown: " + uri);
+        }
+        // notify listeners
+        if (rowsAffected > 0) {
+            getContext().getContentResolver().notifyChange(uri, null);
+        }
+        return rowsAffected;
     }
 
     @Override
     public int delete(Uri uri, String selection, String[] selectionArgs) {
-        final SQLiteDatabase db = dbHelper.getWritableDatabase();
-        int rowsDeleted;
-        switch (uriMatcher.match(uri)) {
+        final SQLiteDatabase db = mOpenHelper.getWritableDatabase();
+        int rowsAffected;
+        switch (sUriMatcher.match(uri)) {
             case BOOK:
-                rowsDeleted = db.delete(
-                        BookContract.BookEntry.TABLE_NAME, selection, selectionArgs);
+                rowsAffected =
+                        db.delete(BookEntry.TABLE_NAME, selection, selectionArgs);
                 break;
             case AUTHOR:
-                rowsDeleted = db.delete(
-                        BookContract.AuthorEntry.TABLE_NAME, selection, selectionArgs);
+                rowsAffected =
+                        db.delete(AuthorEntry.TABLE_NAME, selection, selectionArgs);
                 break;
             case CATEGORY:
-                rowsDeleted = db.delete(
-                        BookContract.CategoryEntry.TABLE_NAME, selection, selectionArgs);
-                break;
-            case BOOK_ID:
-                rowsDeleted = db.delete(
-                        BookContract.BookEntry.TABLE_NAME
-                        , BookContract.BookEntry._ID + " = '" + ContentUris.parseId(uri) + "'"
-                        , selectionArgs);
+                rowsAffected =
+                        db.delete(CategoryEntry.TABLE_NAME, selection, selectionArgs);
                 break;
             default:
                 throw new UnsupportedOperationException("Unknown uri: " + uri);
         }
-        // Because a null deletes all rows
-        if (selection == null || rowsDeleted != 0) {
+        // notify listeners
+        if (rowsAffected > 0 || selection == null) {
             getContext().getContentResolver().notifyChange(uri, null);
         }
-        return rowsDeleted;
+        return rowsAffected;
     }
 
     @Override
-    public int update(Uri uri, ContentValues values, String selection, String[] selectionArgs) {
-        final SQLiteDatabase db = dbHelper.getWritableDatabase();
-        int rowsUpdated;
-        switch (uriMatcher.match(uri)) {
-            case BOOK:
-                rowsUpdated = db.update(BookContract.BookEntry.TABLE_NAME
-                        , values
-                        , selection
-                        , selectionArgs);
-                break;
-            case AUTHOR:
-                rowsUpdated = db.update(BookContract.AuthorEntry.TABLE_NAME
-                        , values
-                        , selection
-                        , selectionArgs);
-                break;
-            case CATEGORY:
-                rowsUpdated = db.update(BookContract.CategoryEntry.TABLE_NAME
-                        , values
-                        , selection
-                        , selectionArgs);
-                break;
-
-            default:
-                throw new UnsupportedOperationException("Unknown uri: " + uri);
-        }
-        if (rowsUpdated != 0) {
-            getContext().getContentResolver().notifyChange(uri, null);
-        }
-        return rowsUpdated;
+    public void shutdown() {
+        mOpenHelper.close();
+        super.shutdown();
     }
 
 }

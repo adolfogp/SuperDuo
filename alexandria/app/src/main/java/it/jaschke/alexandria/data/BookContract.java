@@ -40,11 +40,6 @@ public class BookContract {
     public static final String PATH_BOOK_CATEGORY = "category";
 
     /**
-     * Path for a book's complete data (including author, category, etc.).
-     */
-    public static final String PATH_FULLBOOK = "fullbook";
-
-    /**
      * Defines the contents of the table holding book data.
      *
      * @author Sascha Jaschke
@@ -57,12 +52,6 @@ public class BookContract {
          */
         public static final Uri CONTENT_URI =
                 BASE_CONTENT_URI.buildUpon().appendPath(PATH_BOOK).build();
-
-        /**
-         * URI for complete book data (including author, category, etc.).
-         */
-        public static final Uri FULL_CONTENT_URI =
-                BASE_CONTENT_URI.buildUpon().appendPath(PATH_FULLBOOK).build();
 
         /**
          * Type for {@code content:} URIs with directories of books.
@@ -136,16 +125,16 @@ public class BookContract {
                     .appendPath(PATH_BOOK_CATEGORY).build();
         }
 
-        // TODO: Delete evrything related to "full book"
         /**
-         * Returns the URI for a particular book's full data (including author,
-         * category, etc.) given its id.
+         * Extracts the book's id from a book authors URI or book categories URI.
          *
-         * @param id the book's identifier.
-         * @return the URI for the full data of the book with the specified id.
+         * @param uri the URI from which the movie's id will be extracted.
+         * @return the movie's id.
+         * @see #buildBookAuthorsUri(long)
+         * @see #buildBookCategoriesUri(long)
          */
-        public static Uri buildFullBookUri(long id) {
-            return ContentUris.withAppendedId(FULL_CONTENT_URI, id);
+        public static long getBookIdFromUri(Uri uri) {
+            return Long.parseLong(uri.getPathSegments().get(1));
         }
 
     }
@@ -161,7 +150,8 @@ public class BookContract {
         /**
          * Base URI for author data.
          */
-        public static final Uri CONTENT_URI = BASE_CONTENT_URI.buildUpon().appendPath(PATH_BOOK_AUTHOR).build();
+        public static final Uri CONTENT_URI =
+                BASE_CONTENT_URI.buildUpon().appendPath(PATH_BOOK_AUTHOR).build();
 
         /**
          * Type for {@code content:} URIs with directories of authors' data.

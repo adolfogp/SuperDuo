@@ -17,7 +17,6 @@
     <string name="delete">Delete Book</string>
     <string name="action_share">Share</string>
     <string name="back_button">go back</string>
-    <string name="share_text">A must read book: </string>
     <string name="action_add_book">Add book</string>
     <string name="title_activity_book_list">BookListActivity</string>
 </resources>

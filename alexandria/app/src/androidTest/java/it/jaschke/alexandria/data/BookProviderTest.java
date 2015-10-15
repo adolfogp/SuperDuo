@@ -80,9 +80,6 @@ public class BookProviderTest extends AndroidTestCase {
         type = mContext.getContentResolver().getType(BookContract.BookEntry.buildBookUri(id));
         assertEquals(BookContract.BookEntry.CONTENT_ITEM_TYPE, type);
 
-        type = mContext.getContentResolver().getType(BookContract.BookEntry.buildFullBookUri(id));
-        assertEquals(BookContract.BookEntry.CONTENT_ITEM_TYPE, type);
-
         type = mContext.getContentResolver().getType(BookContract.AuthorEntry.buildAuthorUri(id));
         assertEquals(BookContract.AuthorEntry.CONTENT_ITEM_TYPE, type);
 
@@ -96,9 +93,6 @@ public class BookProviderTest extends AndroidTestCase {
         insertReadBook();
         insertReadAuthor();
         insertReadCategory();
-
-        readFullBook();
-        readFullList();
     }
 
     public void insertReadBook(){
@@ -136,7 +130,6 @@ public class BookProviderTest extends AndroidTestCase {
         Uri authorUri = mContext.getContentResolver().insert(BookContract.AuthorEntry.CONTENT_URI, authorValues);
         long authorRowId = ContentUris.parseId(authorUri);
         assertTrue(authorRowId != -1);
-        assertEquals(authorRowId, BookDbTest.ean);
 
         Cursor cursor = mContext.getContentResolver().query(
                 BookContract.AuthorEntry.CONTENT_URI,
@@ -166,7 +159,6 @@ public class BookProviderTest extends AndroidTestCase {
         Uri categoryUri = mContext.getContentResolver().insert(BookContract.CategoryEntry.CONTENT_URI, categoryValues);
         long categoryRowId = ContentUris.parseId(categoryUri);
         assertTrue(categoryRowId != -1);
-        assertEquals(categoryRowId, BookDbTest.ean);
 
         Cursor cursor = mContext.getContentResolver().query(
                 BookContract.CategoryEntry.CONTENT_URI,
@@ -189,32 +181,5 @@ public class BookProviderTest extends AndroidTestCase {
         BookDbTest.validateCursor(cursor, categoryValues);
 
     }
-
-    public void readFullBook(){
-
-        Cursor cursor = mContext.getContentResolver().query(
-                BookContract.BookEntry.buildFullBookUri(BookDbTest.ean),
-                null, // projection
-                null, // selection
-                null, // selection args
-                null  // sort order
-        );
-
-         BookDbTest.validateCursor(cursor, BookDbTest.getFullDetailValues());
-    }
-
-    public void readFullList(){
-
-        Cursor cursor = mContext.getContentResolver().query(
-                BookContract.BookEntry.FULL_CONTENT_URI,
-                null, // projection
-                null, // selection
-                null, // selection args
-                null  // sort order
-        );
-
-        BookDbTest.validateCursor(cursor, BookDbTest.getFullListValues());
-    }
-
 
 }

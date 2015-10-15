@@ -74,7 +74,7 @@ public class BookListAdapter extends CursorAdapter {
     public View newView(Context context, Cursor cursor, ViewGroup parent) {
         LayoutInflater layoutInflater = LayoutInflater.from(context);
         BookListItemBinding binding = DataBindingUtil.inflate(
-                layoutInflater, R.layout.book_list_item, parent, false);
+                layoutInflater, R.layout.list_item_book, parent, false);
         binding.getRoot().setTag(binding);
         return binding.getRoot();
     }
