@@ -16,11 +16,16 @@
 
 package it.jaschke.alexandria.model.view;
 
+import android.content.Context;
 import android.database.Cursor;
 import android.databinding.BaseObservable;
 import android.databinding.Bindable;
+import android.databinding.BindingAdapter;
 import android.net.Uri;
 import android.util.Log;
+import android.widget.ImageView;
+
+import com.squareup.picasso.Picasso;
 
 import org.apache.commons.lang3.StringUtils;
 import org.parceler.Parcel;
@@ -110,6 +115,35 @@ public class BookDetailViewModel extends BaseObservable {
     }
 
     /**
+     * Returns the subtitle for the currently set {@link Book}, possibly
+     * {@code null}.
+     *
+     * @return the title for the currently set {@link Book}, possibly
+     *     {@code null}.
+     */
+    @Bindable
+    public String getDescription() {
+        return mBook != null
+                ? mBook.getDescription()
+                : null;
+    }
+
+    /**
+     * Returns the URI of the movie's poster image.
+     *
+     * @return the URI of the movie's poster image.
+     */
+    @Bindable
+    public String getCoverUri() {
+        if (mBook == null) {
+            return null;
+        }
+        return mBook.getCoverUri() != null
+                ? mBook.getCoverUri().toString()
+                : null;
+    }
+
+    /**
      * Returns the book's {@link Author}s.
      *
      * @return the book's {@link Author}s.
@@ -137,6 +171,21 @@ public class BookDetailViewModel extends BaseObservable {
         return mBook.getCategories() != null
                 ? mBook.getCategories()
                 : Collections.emptyList();
+    }
+
+    /**
+     * Loads the book's cover image from the specified URI into the
+     * {@link ImageView}. This method is used by the Data Binding Library.
+     *
+     * @param view {@link ImageView} to place the image into.
+     * @param coverUri where the image should be retrieved from.
+     */
+    @BindingAdapter({"bind:coverUri"})
+    public static void loadPosterImage(ImageView view, String coverUri) {
+        Context context = view.getContext();
+        Picasso.with(context)
+                .load(coverUri) // TODO: Add placeholder and error images
+                .into(view);
     }
 
     /**
