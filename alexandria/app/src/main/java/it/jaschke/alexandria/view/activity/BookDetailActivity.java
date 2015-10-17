@@ -23,8 +23,10 @@ import android.support.v7.app.AppCompatActivity;
 
 import org.parceler.Parcels;
 
+import de.greenrobot.event.EventBus;
 import it.jaschke.alexandria.R;
 import it.jaschke.alexandria.model.domain.Book;
+import it.jaschke.alexandria.model.event.BookDeletionEvent;
 import it.jaschke.alexandria.view.fragment.BookDetailFragment;
 
 /**
@@ -65,6 +67,29 @@ public class BookDetailActivity extends AppCompatActivity {
                     , BOOK_DETAIL_FRAGMENT_TAG);
             transaction.commit();
         }
+    }
+
+    @Override
+    public void onResume() {
+        EventBus.getDefault().register(this);
+        super.onResume();
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        EventBus.getDefault().unregister(this);
+    }
+
+    /**
+     * Finishes the {@code Activity} upon receiving notification of a book
+     * deletion event.
+     *
+     * @param event the book deletion event.
+     * @see #finish()
+     */
+    public void onEvent(BookDeletionEvent event) {
+        finish();
     }
 
 }

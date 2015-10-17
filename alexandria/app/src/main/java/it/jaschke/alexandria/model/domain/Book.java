@@ -134,6 +134,8 @@ public class Book {
                 .append(this.mSubtitle)
                 .append(this.mDescription)
                 .append(this.mCoverUri)
+                .append(this.mAuthors)
+                .append(this.mCategories)
                 .toHashCode();
     }
 
@@ -152,6 +154,8 @@ public class Book {
                 .append(this.mSubtitle, that.mSubtitle)
                 .append(this.mDescription, that.mDescription)
                 .append(this.mCoverUri, that.mCoverUri)
+                .append(this.mAuthors, that.mAuthors)
+                .append(this.mCategories, that.mCategories)
                 .isEquals();
     }
 
@@ -163,6 +167,8 @@ public class Book {
                 .append("mSubtitle", this.mSubtitle)
                 .append("mDescription", this.mDescription)
                 .append("mCoverUri", this.mCoverUri)
+                .append("mAuthors", this.mAuthors)
+                .append("mCategories", this.mCategories)
                 .toString();
     }
 

@@ -48,7 +48,7 @@ public class BookDbHelper extends SQLiteOpenHelper {
             + AuthorEntry.COLUMN_BOOK_ID + "  INTEGER NOT NULL, "
             + AuthorEntry.COLUMN_NAME + " TEXT,"
             + " FOREIGN KEY (" + AuthorEntry.COLUMN_BOOK_ID + ") REFERENCES "
-            + BookEntry.TABLE_NAME + " (" + BookEntry._ID + ")"
+            + BookEntry.TABLE_NAME + " (" + BookEntry._ID + ") ON DELETE CASCADE, "
             + "UNIQUE (" + AuthorEntry.COLUMN_BOOK_ID + ", "
             + AuthorEntry.COLUMN_NAME + ") ON CONFLICT REPLACE"
             + ");";
@@ -62,7 +62,7 @@ public class BookDbHelper extends SQLiteOpenHelper {
             + CategoryEntry.COLUMN_BOOK_ID + "  INTEGER NOT NULL, "
             + CategoryEntry.COLUMN_NAME + " TEXT,"
             + " FOREIGN KEY (" + CategoryEntry.COLUMN_BOOK_ID + ") REFERENCES "
-            + BookEntry.TABLE_NAME + " (" + BookEntry._ID + ")"
+            + BookEntry.TABLE_NAME + " (" + BookEntry._ID + ") ON DELETE CASCADE,"
             + "UNIQUE (" + CategoryEntry.COLUMN_BOOK_ID + ", "
             + CategoryEntry.COLUMN_NAME + ") ON CONFLICT REPLACE"
             + ");";
@@ -91,4 +91,11 @@ public class BookDbHelper extends SQLiteOpenHelper {
         onCreate(db);
     }
 
+    @Override
+    public void onOpen(SQLiteDatabase db) {
+        super.onOpen(db);
+        if (!db.isReadOnly()) {
+            db.execSQL("PRAGMA foreign_keys=ON;");
+        }
+    }
 }

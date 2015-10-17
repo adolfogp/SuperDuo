@@ -17,6 +17,7 @@
 package it.jaschke.alexandria.model.view;
 
 import android.content.Context;
+import android.content.Intent;
 import android.database.Cursor;
 import android.databinding.BaseObservable;
 import android.databinding.Bindable;
@@ -32,11 +33,13 @@ import com.squareup.picasso.Picasso;
 
 import org.apache.commons.lang3.StringUtils;
 import org.parceler.Parcel;
+import org.parceler.Parcels;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import de.greenrobot.event.EventBus;
 import it.jaschke.alexandria.BR;
 import it.jaschke.alexandria.R;
 import it.jaschke.alexandria.databinding.AuthorListItemBinding;
@@ -44,6 +47,8 @@ import it.jaschke.alexandria.databinding.CategoryListItemBinding;
 import it.jaschke.alexandria.model.domain.Author;
 import it.jaschke.alexandria.model.domain.Book;
 import it.jaschke.alexandria.model.domain.Category;
+import it.jaschke.alexandria.model.event.BookDeletionEvent;
+import it.jaschke.alexandria.service.BookService;
 
 import static it.jaschke.alexandria.data.BookContract.BookEntry;
 import static it.jaschke.alexandria.data.BookContract.AuthorEntry;
@@ -90,6 +95,26 @@ public class BookDetailViewModel extends BaseObservable {
      */
     public void setBook(Book book) {
         mBook = book;
+    }
+
+    /**
+     * Requests {@link BookService} to delete the book for which the detail data
+     * is shown and publishes a {@link BookDeletionEvent} on the {@link EventBus}.
+     * If no book is set, does nothing.
+     *
+     * @param context the {@link Context} used to comunicate with the
+     *     {@link BookService} to request the book's deletion.
+     */
+    public void deleteBook(Context context) {
+        if (mBook == null) {
+            Log.i(LOG_TAG, "Ignoring deletion request. No book set.");
+            return;
+        }
+        Intent bookIntent = new Intent(context, BookService.class);
+        bookIntent.putExtra(BookService.EXTRA_BOOK, Parcels.wrap(mBook));
+        bookIntent.setAction(BookService.ACTION_DELETE_BOOK);
+        context.startService(bookIntent);
+        EventBus.getDefault().post(new BookDeletionEvent(mBook));
     }
 
     /**

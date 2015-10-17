@@ -123,9 +123,14 @@ public class BookService extends IntentService {
      *             ISBN-13 number.
      */
     private void deleteBook(Book book) {
-        final long isbn = book.getId();
-        getContentResolver().delete(
-                BookContract.BookEntry.buildBookUri(isbn), null, null);
+        int count = getContentResolver().delete(
+                BookEntry.CONTENT_URI
+                , BookEntry._ID + "= ?"
+                , new String[]{Long.toString(book.getId())});
+        Log.i(LOG_TAG, "Deleted book: " + book);
+        if (count != 1) {
+            Log.w(LOG_TAG, "Expected 1 book to be deleted, but got " + count);
+        }
     }
 
     /**

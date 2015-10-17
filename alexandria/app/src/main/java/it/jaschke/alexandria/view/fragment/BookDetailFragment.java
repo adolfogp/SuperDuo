@@ -12,32 +12,24 @@ import android.support.v4.content.Loader;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v7.widget.ShareActionProvider;
 import android.util.Log;
-import android.util.Patterns;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
-import android.widget.TextView;
-
-import com.squareup.picasso.Picasso;
 
 import org.parceler.Parcels;
 
-import it.jaschke.alexandria.databinding.BookDetailFragmentBinding;
-import it.jaschke.alexandria.model.view.BookDetailViewModel;
-import it.jaschke.alexandria.view.activity.MainActivity;
 import it.jaschke.alexandria.R;
-import it.jaschke.alexandria.data.BookContract;
+import it.jaschke.alexandria.databinding.BookDetailFragmentBinding;
 import it.jaschke.alexandria.model.domain.Book;
-import it.jaschke.alexandria.service.BookService;
+import it.jaschke.alexandria.model.view.BookDetailViewModel;
 
 import static it.jaschke.alexandria.data.BookContract.BookEntry;
-import static it.jaschke.alexandria.model.view.BookDetailViewModel.BookDetailQuery;
 import static it.jaschke.alexandria.model.view.BookDetailViewModel.BookAuthorQuery;
 import static it.jaschke.alexandria.model.view.BookDetailViewModel.BookCategoryQuery;
+import static it.jaschke.alexandria.model.view.BookDetailViewModel.BookDetailQuery;
 
 
 /**
@@ -48,8 +40,6 @@ import static it.jaschke.alexandria.model.view.BookDetailViewModel.BookCategoryQ
  * @author Jesús Adolfo García Pasquel
  */
 public class BookDetailFragment extends Fragment {
-
-    // TODO: Put delete button in menu item
 
     /**
      * Identifies the messages written to the log by this class.
@@ -163,8 +153,6 @@ public class BookDetailFragment extends Fragment {
                 , new CategoryLoaderCallbacks());
     }
 
-    //TODO: Add delete action to viewModel and invoke from menu item
-
     @Override
     public View onCreateView(final LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         mBinding = DataBindingUtil.inflate(inflater
@@ -222,6 +210,17 @@ public class BookDetailFragment extends Fragment {
             intent = null;
         }
         return intent;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+        switch (item.getItemId()) {
+            case R.id.menu_item_delete_book:
+                mViewModel.deleteBook(getActivity());
+                return true;
+        }
+        return super.onOptionsItemSelected(item);
     }
 
     /**
