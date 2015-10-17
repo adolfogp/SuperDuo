@@ -245,6 +245,10 @@ public class BookDetailFragment extends Fragment {
         @Override
         public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
             mViewModel.setBookData(data);
+            // Set the share intent, if the provider has already been loaded
+            if (mShareActionProvider != null) {
+                mShareActionProvider.setShareIntent(getShareBookTitleIntent());
+            }
         }
 
         @Override

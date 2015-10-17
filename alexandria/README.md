@@ -32,3 +32,4 @@ as part of the third project assignment for [Udacity's Android Developer Nanodeg
 * The list of books is filetered as the user types the search string.
 * Only one author was stored/retrieved even if the book had more, like
   [9780131103627](https://www.googleapis.com/books/v1/volumes?q=isbn:9780131103627)
+* All the book's authors are now displayed in the book's detail view.

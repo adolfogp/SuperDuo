@@ -30,10 +30,10 @@
                 android:layout_margin="10dp"
                 android:paddingRight="20dp"
                 android:text="@{viewModel.title}"
-                tools:text="Book Title Goes Here"
                 android:textIsSelectable="true"
                 android:textSize="@dimen/head_line"
-                android:textStyle="bold"/>
+                android:textStyle="bold"
+                tools:text="Book Title Goes Here"/>
 
             <ImageView
                 android:id="@+id/fullBookCover"
@@ -43,10 +43,10 @@
                 android:layout_alignStart="@+id/fullBookTitle"
                 android:layout_below="@+id/fullBookTitle"
                 android:layout_marginTop="15dp"
-                app:coverUri="@{viewModel.coverUri}"
                 android:contentDescription="@string/book_cover"
-                tools:layout_width="90dp"
-                tools:layout_height="135dp"/>
+                app:coverUri="@{viewModel.coverUri}"
+                tools:layout_height="135dp"
+                tools:layout_width="90dp"/>
 
             <TextView
                 android:id="@+id/fullBookSubTitle"
@@ -59,8 +59,8 @@
                 android:layout_toRightOf="@+id/fullBookCover"
                 android:ellipsize="end"
                 android:maxLines="5"
-                android:textSize="18sp"
                 android:text="@{viewModel.subtitle}"
+                android:textSize="18sp"
                 tools:text="Book Subtitle Goes Here"/>
 
             <TextView
@@ -82,22 +82,20 @@
                 android:orientation="horizontal"
                 android:padding="10dp">
 
-                <TextView
-                    android:id="@+id/categories"
-                    android:layout_width="wrap_content"
+                <LinearLayout
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    tools:text="Categories Go Here"
-                    android:gravity="left|top"/>
+                    android:orientation="vertical"
+                    app:categories="@{viewModel.categories}"/>
 
-                <TextView
-                    android:id="@+id/authors"
-                    android:layout_width="wrap_content"
+                <LinearLayout
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:gravity="right|top"
-                    tools:text="Authors Go Here"
-                    android:textStyle="bold"/>
+                    android:orientation="vertical"
+                    app:authors="@{viewModel.authors}"/>
+
             </LinearLayout>
 
         </RelativeLayout>

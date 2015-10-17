@@ -21,9 +21,12 @@ import android.database.Cursor;
 import android.databinding.BaseObservable;
 import android.databinding.Bindable;
 import android.databinding.BindingAdapter;
+import android.databinding.DataBindingUtil;
 import android.net.Uri;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 
 import com.squareup.picasso.Picasso;
 
@@ -35,6 +38,9 @@ import java.util.Collections;
 import java.util.List;
 
 import it.jaschke.alexandria.BR;
+import it.jaschke.alexandria.R;
+import it.jaschke.alexandria.databinding.AuthorListItemBinding;
+import it.jaschke.alexandria.databinding.CategoryListItemBinding;
 import it.jaschke.alexandria.model.domain.Author;
 import it.jaschke.alexandria.model.domain.Book;
 import it.jaschke.alexandria.model.domain.Category;
@@ -181,11 +187,66 @@ public class BookDetailViewModel extends BaseObservable {
      * @param coverUri where the image should be retrieved from.
      */
     @BindingAdapter({"bind:coverUri"})
-    public static void loadPosterImage(ImageView view, String coverUri) {
+    public static void loadBookCoverImage(ImageView view, String coverUri) {
         Context context = view.getContext();
         Picasso.with(context)
                 .load(coverUri) // TODO: Add placeholder and error images
                 .into(view);
+    }
+
+    /**
+     * Removes all views from the {@link LinearLayout} and adds new ones for
+     * the specified {@link Author}s.
+     *
+     * @param container {@link LinearLayout} that will contain the authors.
+     * @param authors the {@link Author}s to be placed in the container.
+     */
+    @BindingAdapter({"bind:authors"})
+    public static void loadAuthorViews(LinearLayout container, List<Author> authors) {
+        container.removeAllViews();
+        if (authors == null || authors.isEmpty()) {
+            return;
+        }
+        LayoutInflater inflater = (LayoutInflater) container.getContext()
+                .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        for (Author author : authors) {
+            AuthorListItemBinding binding = DataBindingUtil.inflate(inflater
+                    , R.layout.list_item_author
+                    , container
+                    , false);
+            AuthorListItemViewModel itemViewModel = new AuthorListItemViewModel();
+            itemViewModel.setAuthor(author);
+            binding.setViewModel(itemViewModel);
+            container.addView(binding.getRoot());
+        }
+    }
+
+    /**
+     * Removes all views from the {@link LinearLayout} and adds new ones for
+     * the specified instances of {@link Category}.
+     *
+     * @param container {@link LinearLayout} that will contain the categories.
+     * @param categories the instances of {@link Category} to be placed in the
+     *                   container.
+     */
+    @BindingAdapter({"bind:categories"})
+    public static void loadCategoryViews(LinearLayout container, List<Category> categories) {
+        container.removeAllViews();
+        if (categories == null || categories.isEmpty()) {
+            return;
+        }
+        LayoutInflater inflater = (LayoutInflater) container.getContext()
+                .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        for (Category category : categories) {
+            CategoryListItemBinding binding = DataBindingUtil.inflate(inflater
+                    , R.layout.list_item_category
+                    , container
+                    , false);
+            CategoryListItemViewModel itemViewModel = new CategoryListItemViewModel();
+            itemViewModel.setCategory(category);
+            binding.setViewModel(itemViewModel);
+            container.addView(binding.getRoot());
+        }
     }
 
     /**
