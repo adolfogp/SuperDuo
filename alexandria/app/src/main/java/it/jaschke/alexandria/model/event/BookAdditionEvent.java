@@ -19,33 +19,34 @@ package it.jaschke.alexandria.model.event;
 import it.jaschke.alexandria.model.domain.Book;
 
 /**
- * Event that occurs when a book is deleted.
+ * Event that occurs when a book is added.
  *
  * @author Jesús Adolfo García Pasquel
  */
-public class BookDeletionEvent {
+public class BookAdditionEvent {
 
     /**
-     * The {@link Book} that was deleted.
+     * The {@link Book} that was added.
      */
     private final Book mBook;
 
     /**
-     * Creates a new {@link BookDeletionEvent} for the {@link Book} passed
+     * Creates a new {@link BookAdditionEvent} for the {@link Book} passed
      * as argument.
      *
      * @param movie the {@link Book} that was selected.
      */
-    public BookDeletionEvent(Book movie) {
+    public BookAdditionEvent(Book movie) {
         mBook = movie;
     }
 
     /**
-     * Returns the {@link Book} that was deleted.
+     * Returns the {@link Book} that was added.
      *
-     * @return the {@link Book} that was deleted.
+     * @return the {@link Book} that was added.
      */
-    public Book getDeletedBook() {
+    public Book getAddedBook() {
         return mBook;
     }
+
 }

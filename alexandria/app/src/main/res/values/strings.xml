@@ -1,20 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
-<resources>
+<resources xmlns:xliff="http://schemas.android.com/apk/res-auto">
     <string name="app_name">Alexandria</string>
     <string name="title_activity_book_detail">Details</string>
     <string name="title_activity_book_addition">Add book</string>
 
     <string name="scan_button">Scan</string>
     <string name="input_hint">Insert ISBN-13. Digits only.</string>
+    <string name="msg_invalid_isbn">Invalid ISBN-13 <xliff:g id="isbn">%1$s</xliff:g></string>
     <string name="book_cover">Book cover</string>
 
-    <string name="no_result">No book found</string>
-    <string name="download_error">Unable to download book data</string>
-    <string name="response_processing_error">Unable to process book data</string>
-    <string name="ok_button">Next</string>
-    <string name="cancel_button">Cancel</string>
+    <string name="msg_no_result">No book found</string>
+    <string name="msg_download_error">Unable to download book data</string>
+    <string name="msg_book_added">Added book <xliff:g id="isbn">%1$s</xliff:g></string>
+    <string name="msg_response_processing_error">Unable to process book data</string>
     <string name="search">Search</string>
-    <string name="delete">Delete Book</string>
     <string name="action_share">Share</string>
     <string name="back_button">go back</string>
     <string name="action_add_book">Add book</string>

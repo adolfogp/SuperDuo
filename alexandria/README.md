@@ -35,3 +35,5 @@ as part of the third project assignment for [Udacity's Android Developer Nanodeg
 * All the book's authors are now displayed in the book's detail view.
 * All the book's categories are now displayed in the book's detail view.
 * Enabled foreign keys on the SQLite database connection.
+* Removed redundant functionality from the book addition fragment, reusing
+  the book detail fragment instead.

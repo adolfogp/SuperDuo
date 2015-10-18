@@ -24,14 +24,22 @@ import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 import android.widget.Toast;
 
+import org.parceler.Parcels;
+
+import de.greenrobot.event.EventBus;
 import it.jaschke.alexandria.R;
+import it.jaschke.alexandria.model.domain.Book;
+import it.jaschke.alexandria.model.event.BookAdditionEvent;
 import it.jaschke.alexandria.service.BookService;
 
 /**
  * Handles notifications broadcasted by {@link BookService}. Receives
  * {@link Intent}s with action  {@link BookService#ACTION_NOTIFY} and
  * displays messages using a {@link Toast} based on the {@link Intent}s
- * category (e.g. {@link BookService#CATEGORY_DOWNLOAD_ERROR}).
+ * category (e.g. {@link BookService#CATEGORY_DOWNLOAD_ERROR}). In case of
+ * {@link BookService#CATEGORY_SUCCESSFULLY_ADDED} or
+ * {@link BookService#CATEGORY_ALREADY_REGISTERED} publishes a
+ * {@link BookAdditionEvent} on the {@link EventBus}.
  *
  * @author Jesús Adolfo García Pasquel
  */
@@ -53,11 +61,16 @@ public class NotificationBroadcastReceiver extends BroadcastReceiver {
         String message = null;
         final String category = intent.getCategories().iterator().next();
         if (BookService.CATEGORY_NO_RESULT.equals(category)) {
-            message = context.getString(R.string.no_result);
+            message = context.getString(R.string.msg_no_result);
         } else if (BookService.CATEGORY_DOWNLOAD_ERROR.equals(category)) {
-            message = context.getString(R.string.download_error);
+            message = context.getString(R.string.msg_download_error);
         } else if (BookService.CATEGORY_RESULT_PROCESSING_ERROR.equals(category)) {
-            message = context.getString(R.string.response_processing_error);
+            message = context.getString(R.string.msg_response_processing_error);
+        } else if (BookService.CATEGORY_ALREADY_REGISTERED.equals(category)
+                || BookService.CATEGORY_SUCCESSFULLY_ADDED.equals(category)) {
+            Book book = Parcels.unwrap(intent.getParcelableExtra(BookService.EXTRA_BOOK));
+            message = context.getString(R.string.msg_book_added, book.getId());
+            EventBus.getDefault().post(new BookAdditionEvent(book));
         } else {
             Log.e(LOG_TAG, "Unexpected notification category "+ category);
         }
@@ -82,6 +95,8 @@ public class NotificationBroadcastReceiver extends BroadcastReceiver {
         filter.addCategory(BookService.CATEGORY_NO_RESULT);
         filter.addCategory(BookService.CATEGORY_DOWNLOAD_ERROR);
         filter.addCategory(BookService.CATEGORY_RESULT_PROCESSING_ERROR);
+        filter.addCategory(BookService.CATEGORY_ALREADY_REGISTERED);
+        filter.addCategory(BookService.CATEGORY_SUCCESSFULLY_ADDED);
         LocalBroadcastManager.getInstance(context)
                 .registerReceiver(broadcastReceiver, filter);
         return broadcastReceiver;

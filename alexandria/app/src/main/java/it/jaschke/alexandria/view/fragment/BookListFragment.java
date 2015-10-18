@@ -7,13 +7,11 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 
-import org.apache.commons.lang3.StringUtils;
 import org.parceler.Parcels;
 
 import de.greenrobot.event.EventBus;
@@ -22,7 +20,6 @@ import it.jaschke.alexandria.databinding.BookListFragmentBinding;
 import it.jaschke.alexandria.model.event.SearchStringChangeEvent;
 import it.jaschke.alexandria.model.view.BookListViewModel;
 import it.jaschke.alexandria.view.adapter.BookListAdapter;
-import it.jaschke.alexandria.data.BookContract;
 
 /**
  * Displays a list of the books in the {@code ContentProvider}, including
@@ -70,7 +67,7 @@ public class BookListFragment extends Fragment implements LoaderManager.LoaderCa
      *
      * @see #updateBookList()
      */
-    private final View.OnClickListener searchClickLister = (view) -> updateBookList();
+    private final View.OnClickListener mSearchClickLister = (view) -> updateBookList();
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -120,7 +117,7 @@ public class BookListFragment extends Fragment implements LoaderManager.LoaderCa
         mBinding.bookListView.setAdapter(mBookListAdapter);
         mBinding.searchEditText.addTextChangedListener(
                 mViewModel.getSearchStringWatcher());
-        mBinding.searchImageButton.setOnClickListener(searchClickLister);
+        mBinding.searchImageButton.setOnClickListener(mSearchClickLister);
         return mBinding.getRoot();
     }
 

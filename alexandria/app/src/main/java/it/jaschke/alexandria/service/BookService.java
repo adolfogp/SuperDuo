@@ -99,6 +99,20 @@ public class BookService extends IntentService {
             "it.jaschke.alexandria.service.category.CATEGORY_RESULT_PROCESSING_ERROR";
 
     /**
+     * Category used to notify that the book was successfully added to the
+     * {@code ContentProvider}.
+     */
+    public static final String CATEGORY_SUCCESSFULLY_ADDED =
+            "it.jaschke.alexandria.service.category.CATEGORY_SUCCESSFULLY_ADDED";
+
+    /**
+     * Category used to notify that no addition was performed, since the book
+     * wal already registered in the {@code ContentProvider}.
+     */
+    public static final String CATEGORY_ALREADY_REGISTERED =
+            "it.jaschke.alexandria.service.category.CATEGORY_ALREADY_REGISTERED";
+
+    /**
      * Creates a new instance of {@link BookService}.
      */
     public BookService() {
@@ -172,6 +186,7 @@ public class BookService extends IntentService {
         }
         // Do not fetch books already in the database.
         if (isBookFetched(isbn)) {
+            postNotification(CATEGORY_ALREADY_REGISTERED, book);
             return;
         }
 
@@ -238,6 +253,7 @@ public class BookService extends IntentService {
             if(bookInfo.has(CATEGORIES)){
                 insertCategories(isbn, bookInfo.getJSONArray(CATEGORIES));
             }
+            postNotification(CATEGORY_SUCCESSFULLY_ADDED, book);
         } catch (JSONException e) {
             Log.e(LOG_TAG, "Error processing JSON", e);
             postNotification(CATEGORY_RESULT_PROCESSING_ERROR, book);

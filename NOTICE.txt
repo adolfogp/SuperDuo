@@ -19,3 +19,6 @@ available at https://materialdesignicons.com/
 
 ic_delete.png is based on the CC-BY 4.0 licensed SVG image delete.svg
 available at https://materialdesignicons.com/
+
+ic_barcode.png is based on the CC-BY 4.0 licensed SVG image barcode.svg
+available at https://materialdesignicons.com/
