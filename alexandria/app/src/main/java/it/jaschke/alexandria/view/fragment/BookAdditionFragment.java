@@ -87,6 +87,7 @@ public class BookAdditionFragment extends Fragment {
             if (s != null && s.toString().length() ==
                     getResources().getInteger(R.integer.isbn13_length)) {
                 if (mViewModel.isValidIsbn(mViewModel.getIsbn())) {
+                    mBinding.isbnEditText.setError(null);
                     requestBookAddition();
                 } else {
                     mBinding.isbnEditText.setError(getString(

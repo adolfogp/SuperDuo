@@ -1,11 +1,12 @@
 package it.jaschke.alexandria.view.activity;
 
 import android.content.Intent;
-import android.content.res.Configuration;
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 
@@ -14,6 +15,8 @@ import org.parceler.Parcels;
 import de.greenrobot.event.EventBus;
 import it.jaschke.alexandria.R;
 import it.jaschke.alexandria.model.domain.Book;
+import it.jaschke.alexandria.model.event.BookAdditionEvent;
+import it.jaschke.alexandria.model.event.BookDeletionEvent;
 import it.jaschke.alexandria.model.event.BookSelectionEvent;
 import it.jaschke.alexandria.receiver.NotificationBroadcastReceiver;
 import it.jaschke.alexandria.service.BookService;
@@ -34,6 +37,18 @@ public class MainActivity extends AppCompatActivity {
     private static final String LOG_TAG = MainActivity.class.getSimpleName();
 
     /**
+     * Identifies the {@code Fragment} used to present the details of a book.
+     */
+    private static final String TAG_BOOK_DETAIL_FRAGMENT =
+            BookDetailFragment.class.getCanonicalName();
+
+    /**
+     * Identifies the {@code Fragment} used to add books.
+     */
+    private static final String TAG_BOOK_ADDITION_FRAGMENT =
+            BookAdditionFragment.class.getCanonicalName();
+
+    /**
      * Indicates if the activity contains two panes (master-detail) or just
      * one.
      */
@@ -48,7 +63,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        if (findViewById(R.id.container) != null) {
+        if (findViewById(R.id.book_detail_container) != null) {
             mTwoPane = true;
             if (savedInstanceState == null) {
                 // TODO: Put a placeholder fragment in the detail area.
@@ -81,7 +96,33 @@ public class MainActivity extends AppCompatActivity {
      * @param event the book selection event.
      */
     public void onEvent(BookSelectionEvent event) {
-        showBookDetail(event.getSelectedBook());
+        showSelectedBookDetail(event.getSelectedBook());
+    }
+
+    /**
+     * Displays the detail view of the selected book.
+     *
+     * @param event the book selection event.
+     */
+    public void onEvent(BookAdditionEvent event) {
+        showAddedBookDetail(event.getAddedBook());
+    }
+
+    /**
+     * Removes the detail view of the added book.
+     *
+     * @param event the book selection event.
+     */
+    public void onEvent(BookDeletionEvent event) {
+        FragmentManager fragmentManager = getSupportFragmentManager();
+        Fragment detailFragment =
+                fragmentManager.findFragmentByTag(TAG_BOOK_DETAIL_FRAGMENT);
+        if (detailFragment == null) {
+            return;
+        }
+        FragmentTransaction transaction = fragmentManager.beginTransaction();
+        transaction.remove(detailFragment);
+        transaction.commit();
     }
 
     @Override
@@ -109,7 +150,9 @@ public class MainActivity extends AppCompatActivity {
         if (mTwoPane) {
             FragmentManager fragmentManager = getSupportFragmentManager();
             FragmentTransaction transaction = fragmentManager.beginTransaction();
-            transaction.replace(R.id.container, new BookAdditionFragment());
+            transaction.replace(R.id.book_addition_container
+                    , new BookAdditionFragment()
+                    , TAG_BOOK_ADDITION_FRAGMENT);
             transaction.commit();
         } else {
             Intent intent = new Intent(this, BookAdditionActivity.class);
@@ -121,18 +164,41 @@ public class MainActivity extends AppCompatActivity {
      * Shows the book's details on a new {@code Activity} or the same one,
      * depending on the screen size of the device being used.
      */
-    private void showBookDetail(Book book) {
+    private void showSelectedBookDetail(Book book) {
         if (mTwoPane) {
             FragmentManager fragmentManager = getSupportFragmentManager();
+            Fragment bookAdditionFragment =
+                    fragmentManager.findFragmentByTag(TAG_BOOK_ADDITION_FRAGMENT);
             FragmentTransaction transaction = fragmentManager.beginTransaction();
+            if (bookAdditionFragment != null) {
+                transaction.remove(bookAdditionFragment);
+            }
             transaction.replace(R.id.book_detail_container
-                    , BookDetailFragment.newInstance(book));
+                    , BookDetailFragment.newInstance(book)
+                    , TAG_BOOK_DETAIL_FRAGMENT);
             transaction.commit();
         } else {
             Intent intent = new Intent(this, BookDetailActivity.class);
             intent.putExtra(BookDetailActivity.EXTRA_BOOK, Parcels.wrap(book));
             startActivity(intent);
         }
+    }
+
+    /**
+     * Shows the added book's details on its container if two panes are
+     * avialable. Otherwise ignores the request.
+     */
+    private void showAddedBookDetail(Book book) {
+        if (!mTwoPane) {
+            Log.w(LOG_TAG, "Ignoring request to show details for the added book.");
+            return;
+        }
+        FragmentManager fragmentManager = getSupportFragmentManager();
+        FragmentTransaction transaction = fragmentManager.beginTransaction();
+        transaction.replace(R.id.book_detail_container
+                , BookDetailFragment.newInstance(book)
+                , TAG_BOOK_DETAIL_FRAGMENT);
+        transaction.commit();
     }
 
 }

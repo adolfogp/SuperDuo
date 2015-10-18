@@ -13,11 +13,23 @@
   ~ See the License for the specific language governing permissions and
   ~ limitations under the License.
   -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              xmlns:tools="http://schemas.android.com/tools"
+              android:layout_width="match_parent"
+              android:layout_height="match_parent"
+              android:orientation="vertical">
 
-<fragment android:id="@+id/fragment_book_addition"
-          android:name="it.jaschke.alexandria.view.fragment.BookAdditionFragment"
-          xmlns:android="http://schemas.android.com/apk/res/android"
-          xmlns:tools="http://schemas.android.com/tools"
-          android:layout_width="match_parent"
-          android:layout_height="match_parent"
-          tools:layout="@layout/fragment_book_addition"/>
+    <fragment
+        android:id="@+id/fragment_book_addition"
+        android:name="it.jaschke.alexandria.view.fragment.BookAdditionFragment"
+
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        tools:layout="@layout/fragment_book_addition"/>
+
+    <FrameLayout
+        android:id="@+id/book_detail_container"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"/>
+
+</LinearLayout>
