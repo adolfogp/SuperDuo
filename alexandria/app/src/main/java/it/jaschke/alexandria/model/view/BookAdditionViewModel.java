@@ -16,15 +16,7 @@
 
 package it.jaschke.alexandria.model.view;
 
-import android.text.Editable;
-import android.text.TextWatcher;
-import android.util.Log;
-
-import org.apache.commons.lang3.StringUtils;
 import org.parceler.Parcel;
-
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 /**
  * View model for the book addition view. Provides data and behaviour.
@@ -58,18 +50,16 @@ public class BookAdditionViewModel {
     }
 
     public void setIsbn(String isbn) {
-        if (StringUtils.equals(mIsbn, isbn)) {
-            return;
-        }
         mIsbn = isbn;
     }
 
     /**
      * Returns {@code true} if the argument is a valid ISBN-13 number. That is,
-     * it is made of 13 digits, starting with
+     * it is made of 13 digits, starting with 978 or 979.
      *
-     * @param scannedCode
-     * @return
+     * @param scannedCode the strig to check for validity.
+     * @return {@code true} if the argument is a valid ISBN-13 number.
+     * @see #ISBN13_REGULAR_EXPRESSION
      */
     public boolean isValidIsbn(String scannedCode) {
         if (scannedCode == null) {

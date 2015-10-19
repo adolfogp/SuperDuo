@@ -16,8 +16,6 @@
 
 package it.jaschke.alexandria.model.event;
 
-import it.jaschke.alexandria.view.fragment.BookListFragment;
-
 /**
  * Event that occurs when the search string is modified. For example, when the
  * user types in a word.

@@ -21,6 +21,7 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
+import it.jaschke.alexandria.R;
 import it.jaschke.alexandria.model.domain.Book;
 import it.jaschke.alexandria.data.BookContract;
 
@@ -40,11 +41,6 @@ import static it.jaschke.alexandria.data.BookContract.BookEntry;
  * @author Jesús Adolfo García Pasquel
  */
 public class BookService extends IntentService {
-
-    /**
-     * Identifies messages written to the log by this class.
-     */
-    private static final String LOG_TAG = BookService.class.getSimpleName();
 
     /**
      * Action specified to the service in {@link Intent}s that request that data
@@ -111,6 +107,11 @@ public class BookService extends IntentService {
      */
     public static final String CATEGORY_ALREADY_REGISTERED =
             "it.jaschke.alexandria.service.category.CATEGORY_ALREADY_REGISTERED";
+
+    /**
+     * Identifies messages written to the log by this class.
+     */
+    private static final String LOG_TAG = BookService.class.getSimpleName();
 
     /**
      * Creates a new instance of {@link BookService}.
@@ -180,7 +181,7 @@ public class BookService extends IntentService {
      */
     private void fetchBook(Book book) {
         final long isbn = book.getId();
-        if(Long.toString(isbn).length() != 13) {
+        if (Long.toString(isbn).length() != getResources().getInteger(R.integer.isbn13_length)) {
             Log.w(LOG_TAG, "Not an ISBN-13. Ignoring " + isbn);
             return;
         }
@@ -204,54 +205,54 @@ public class BookService extends IntentService {
             return;
         }
 
-
-        final String ITEMS = "items";
-        final String VOLUME_INFO = "volumeInfo";
-        final String TITLE = "title";
-        final String SUBTITLE = "subtitle";
-        final String AUTHORS = "authors";
-        final String DESCRIPTION = "description";
-        final String CATEGORIES = "categories";
-        final String IMG_URL_PATH = "imageLinks";
-        final String IMG_URL = "thumbnail";
+        // JSON tag names
+        final String tagItems = "items";
+        final String tagVolumeInfo = "volumeInfo";
+        final String tagTitle = "title";
+        final String tagSubtitle = "subtitle";
+        final String tagAuthors = "authors";
+        final String tagDescription = "description";
+        final String tagCategories = "categories";
+        final String tagImageLinks = "imageLinks";
+        final String tagThumbnail = "thumbnail";
         try {
             JSONObject bookJson = new JSONObject(bookJsonString);
             JSONArray bookArray;
-            if(bookJson.has(ITEMS)){
-                bookArray = bookJson.getJSONArray(ITEMS);
-            }else{
+            if (bookJson.has(tagItems)) {
+                bookArray = bookJson.getJSONArray(tagItems);
+            } else {
                 postNotification(CATEGORY_NO_RESULT, book);
                 return;
             }
 
             JSONObject bookInfo =
-                    ((JSONObject) bookArray.get(0)).getJSONObject(VOLUME_INFO);
+                    ((JSONObject) bookArray.get(0)).getJSONObject(tagVolumeInfo);
 
-            String title = bookInfo.getString(TITLE);
+            String title = bookInfo.getString(tagTitle);
 
             String subtitle = StringUtils.EMPTY;
-            if(bookInfo.has(SUBTITLE)) {
-                subtitle = bookInfo.getString(SUBTITLE);
+            if (bookInfo.has(tagSubtitle)) {
+                subtitle = bookInfo.getString(tagSubtitle);
             }
 
             String desc = StringUtils.EMPTY;
-            if(bookInfo.has(DESCRIPTION)){
-                desc = bookInfo.getString(DESCRIPTION);
+            if (bookInfo.has(tagDescription)) {
+                desc = bookInfo.getString(tagDescription);
             }
 
             String imgUrl = StringUtils.EMPTY;
-            if(bookInfo.has(IMG_URL_PATH)
-                    && bookInfo.getJSONObject(IMG_URL_PATH).has(IMG_URL)) {
-                imgUrl = bookInfo.getJSONObject(IMG_URL_PATH).getString(IMG_URL);
+            if (bookInfo.has(tagImageLinks)
+                    && bookInfo.getJSONObject(tagImageLinks).has(tagThumbnail)) {
+                imgUrl = bookInfo.getJSONObject(tagImageLinks).getString(tagThumbnail);
             }
 
             insertBook(isbn, title, subtitle, desc, imgUrl);
 
-            if(bookInfo.has(AUTHORS)) {
-                insertAuthors(isbn, bookInfo.getJSONArray(AUTHORS));
+            if (bookInfo.has(tagAuthors)) {
+                insertAuthors(isbn, bookInfo.getJSONArray(tagAuthors));
             }
-            if(bookInfo.has(CATEGORIES)){
-                insertCategories(isbn, bookInfo.getJSONArray(CATEGORIES));
+            if (bookInfo.has(tagCategories)) {
+                insertCategories(isbn, bookInfo.getJSONArray(tagCategories));
             }
             postNotification(CATEGORY_SUCCESSFULLY_ADDED, book);
         } catch (JSONException e) {
@@ -288,12 +289,12 @@ public class BookService extends IntentService {
      */
     private String downloadBookData(long isbn) throws IOException {
         StringBuilder buffer = new StringBuilder();
-        final String FORECAST_BASE_URL =
+        final String webServiceBaseUrl =
                 "https://www.googleapis.com/books/v1/volumes?";
-        final String QUERY_PARAM = "q";
-        final String ISBN_PARAM = "isbn:" + isbn;
-        Uri builtUri = Uri.parse(FORECAST_BASE_URL).buildUpon()
-                .appendQueryParameter(QUERY_PARAM, ISBN_PARAM)
+        final String queryParam = "q";
+        final String isbnParam = "isbn:" + isbn;
+        Uri builtUri = Uri.parse(webServiceBaseUrl).buildUpon()
+                .appendQueryParameter(queryParam, isbnParam)
                 .build();
         URL url = new URL(builtUri.toString());
         HttpURLConnection urlConnection = null;
@@ -342,13 +343,13 @@ public class BookService extends IntentService {
             , String subtitle
             , String description
             , String coverImageUrl) {
-        ContentValues values= new ContentValues();
+        ContentValues values = new ContentValues();
         values.put(BookContract.BookEntry._ID, id);
         values.put(BookContract.BookEntry.COLUMN_TITLE, title);
         values.put(BookContract.BookEntry.COLUMN_COVER_IMAGE_URL, coverImageUrl);
         values.put(BookContract.BookEntry.COLUMN_SUBTITLE, subtitle);
         values.put(BookContract.BookEntry.COLUMN_DESCRIPTION, description);
-        getContentResolver().insert(BookContract.BookEntry.CONTENT_URI,values);
+        getContentResolver().insert(BookContract.BookEntry.CONTENT_URI, values);
     }
 
     /**
@@ -359,12 +360,12 @@ public class BookService extends IntentService {
      * @throws JSONException if an error occurs while accessing the data.
      */
     private void insertAuthors(long id, JSONArray jsonArray) throws JSONException {
-        ContentValues values= new ContentValues();
+        ContentValues values = new ContentValues();
         for (int i = 0; i < jsonArray.length(); i++) {
             values.put(BookContract.AuthorEntry.COLUMN_BOOK_ID, id);
             values.put(BookContract.AuthorEntry.COLUMN_NAME, jsonArray.getString(i));
             getContentResolver().insert(BookContract.AuthorEntry.CONTENT_URI, values);
-            values= new ContentValues();
+            values = new ContentValues();
         }
     }
 
@@ -376,12 +377,12 @@ public class BookService extends IntentService {
      * @throws JSONException if an error occurs while accessing the data.
      */
     private void insertCategories(long id, JSONArray jsonArray) throws JSONException {
-        ContentValues values= new ContentValues();
+        ContentValues values = new ContentValues();
         for (int i = 0; i < jsonArray.length(); i++) {
             values.put(BookContract.CategoryEntry.COLUMN_BOOK_ID, id);
             values.put(BookContract.CategoryEntry.COLUMN_NAME, jsonArray.getString(i));
             getContentResolver().insert(BookContract.CategoryEntry.CONTENT_URI, values);
-            values= new ContentValues();
+            values = new ContentValues();
         }
     }
  }

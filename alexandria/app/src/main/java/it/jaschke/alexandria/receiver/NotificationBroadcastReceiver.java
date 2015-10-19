@@ -72,7 +72,7 @@ public class NotificationBroadcastReceiver extends BroadcastReceiver {
             message = context.getString(R.string.msg_book_added, book.getId());
             EventBus.getDefault().post(new BookAdditionEvent(book));
         } else {
-            Log.e(LOG_TAG, "Unexpected notification category "+ category);
+            Log.e(LOG_TAG, "Unexpected notification category " + category);
         }
         if (message != null) {
             Toast.makeText(context, message, Toast.LENGTH_LONG).show();

@@ -17,13 +17,13 @@
 package it.jaschke.alexandria.model.event;
 
 import it.jaschke.alexandria.model.domain.Book;
-import it.jaschke.alexandria.view.fragment.BookListFragment;
 
 /**
  * Event that occurs when a book is selected. For example, from a list of
- * books, like the one handled by {@link BookListFragment}.
+ * books.
  *
  * @author Jesús Adolfo García Pasquel
+ * @see it.jaschke.alexandria.view.fragment.BookListFragment
  */
 public class BookSelectionEvent {
 

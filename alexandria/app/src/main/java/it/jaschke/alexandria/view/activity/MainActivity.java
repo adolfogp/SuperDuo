@@ -19,7 +19,6 @@ import it.jaschke.alexandria.model.event.BookAdditionEvent;
 import it.jaschke.alexandria.model.event.BookDeletionEvent;
 import it.jaschke.alexandria.model.event.BookSelectionEvent;
 import it.jaschke.alexandria.receiver.NotificationBroadcastReceiver;
-import it.jaschke.alexandria.service.BookService;
 import it.jaschke.alexandria.view.fragment.BookAdditionFragment;
 import it.jaschke.alexandria.view.fragment.BookDetailFragment;
 
@@ -27,6 +26,7 @@ import it.jaschke.alexandria.view.fragment.BookDetailFragment;
  * Presents a collection of books to select from, the details of the selected
  * book and lets the user add more books by entering their ISBN-13 number.
  *
+ * @author Sascha Jaschke
  * @author Jesús Adolfo García Pasquel
  */
 public class MainActivity extends AppCompatActivity {
@@ -55,7 +55,8 @@ public class MainActivity extends AppCompatActivity {
     private boolean mTwoPane;
 
     /**
-     * Receives notifications broadcasted by {@link BookService}.
+     * Receives notifications broadcasted by
+     * {@link it.jaschke.alexandria.service.BookService}.
      */
     private NotificationBroadcastReceiver mBookNotificationReceiver;
 
@@ -138,8 +139,9 @@ public class MainActivity extends AppCompatActivity {
             case R.id.menu_item_add_book:
                 showAddBook();
                 return true;
+            default:
+                return super.onOptionsItemSelected(item);
         }
-        return super.onOptionsItemSelected(item);
     }
 
     /**
@@ -163,6 +165,8 @@ public class MainActivity extends AppCompatActivity {
     /**
      * Shows the book's details on a new {@code Activity} or the same one,
      * depending on the screen size of the device being used.
+     *
+     * @param book the book to show.
      */
     private void showSelectedBookDetail(Book book) {
         if (mTwoPane) {
@@ -187,6 +191,8 @@ public class MainActivity extends AppCompatActivity {
     /**
      * Shows the added book's details on its container if two panes are
      * avialable. Otherwise ignores the request.
+     *
+     * @param book the book to show.
      */
     private void showAddedBookDetail(Book book) {
         if (!mTwoPane) {

@@ -9,11 +9,8 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteQueryBuilder;
 import android.net.Uri;
 
-import it.jaschke.alexandria.model.domain.Author;
-import it.jaschke.alexandria.model.domain.Category;
-
-import static it.jaschke.alexandria.data.BookContract.BookEntry;
 import static it.jaschke.alexandria.data.BookContract.AuthorEntry;
+import static it.jaschke.alexandria.data.BookContract.BookEntry;
 import static it.jaschke.alexandria.data.BookContract.CategoryEntry;
 
 /**
@@ -105,11 +102,6 @@ public class BookProvider extends ContentProvider {
     private static UriMatcher sUriMatcher = buildUriMatcher();
 
     /**
-     * Used to get access the database holding the data.
-     */
-    private BookDbHelper mOpenHelper;
-
-    /**
      * Used to query book data.
      */
     private static SQLiteQueryBuilder sBookQueryBuilder;
@@ -140,6 +132,11 @@ public class BookProvider extends ContentProvider {
     }
 
     /**
+     * Used to get access the database holding the data.
+     */
+    private BookDbHelper mOpenHelper;
+
+    /**
      * Returns a new instance of {@link UriMatcher} that maps URIs to the
      * equivalent constants used by the provider.
      *
@@ -152,11 +149,11 @@ public class BookProvider extends ContentProvider {
     private static UriMatcher buildUriMatcher() {
         UriMatcher matcher = new UriMatcher(UriMatcher.NO_MATCH);
         matcher.addURI(BookContract.CONTENT_AUTHORITY
-                , BookContract.PATH_BOOK +"/#", BOOK_ID);
+                , BookContract.PATH_BOOK + "/#", BOOK_ID);
         matcher.addURI(BookContract.CONTENT_AUTHORITY
-                , BookContract.PATH_BOOK_AUTHOR +"/#", AUTHOR_ID);
+                , BookContract.PATH_BOOK_AUTHOR + "/#", AUTHOR_ID);
         matcher.addURI(BookContract.CONTENT_AUTHORITY
-                , BookContract.PATH_BOOK_CATEGORY +"/#", CATEGORY_ID);
+                , BookContract.PATH_BOOK_CATEGORY + "/#", CATEGORY_ID);
         matcher.addURI(BookContract.CONTENT_AUTHORITY
                 , BookContract.PATH_BOOK, BOOK);
         matcher.addURI(BookContract.CONTENT_AUTHORITY

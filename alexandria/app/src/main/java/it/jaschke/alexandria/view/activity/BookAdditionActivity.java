@@ -34,6 +34,8 @@ import it.jaschke.alexandria.view.fragment.BookDetailFragment;
  * Displays a {@code Fragment} that lets the user search for books by their
  * ISBN-13 number and add them to the {@code ContentProvider}.
  *
+ * @author Sascha Jaschke
+ * @author Jesús Adolfo García Pasquel
  * @see it.jaschke.alexandria.view.fragment.BookAdditionFragment
  * @see it.jaschke.alexandria.service.BookService
  * @see it.jaschke.alexandria.data.BookProvider
@@ -104,6 +106,8 @@ public class BookAdditionActivity extends AppCompatActivity {
     /**
      * Shows the book's details on a new {@code Activity} or the same one,
      * depending on the screen size of the device being used.
+     *
+     * @param book the book to show.
      */
     private void showBookDetail(Book book) {
         FragmentManager fragmentManager = getSupportFragmentManager();

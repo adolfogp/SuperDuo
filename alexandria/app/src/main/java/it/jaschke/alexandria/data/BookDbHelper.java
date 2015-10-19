@@ -19,7 +19,7 @@ public class BookDbHelper extends SQLiteOpenHelper {
     /**
      * Version number of the dabase.
      */
-    private static final int DATABASE_VERSION = 2;
+    public static final int DATABASE_VERSION = 2;
 
     /**
      * Name of the SQLite database file.
@@ -36,7 +36,7 @@ public class BookDbHelper extends SQLiteOpenHelper {
             + BookEntry.COLUMN_SUBTITLE + " TEXT ,"
             + BookEntry.COLUMN_DESCRIPTION + " TEXT ,"
             + BookEntry.COLUMN_COVER_IMAGE_URL + " TEXT, "
-            + "UNIQUE ("+ BookEntry._ID +") ON CONFLICT IGNORE"
+            + "UNIQUE (" + BookEntry._ID + ") ON CONFLICT IGNORE"
             + ");";
 
     /**

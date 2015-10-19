@@ -154,7 +154,9 @@ public class BookDetailFragment extends Fragment {
     }
 
     @Override
-    public View onCreateView(final LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+    public View onCreateView(final LayoutInflater inflater
+            , ViewGroup container
+            , Bundle savedInstanceState) {
         mBinding = DataBindingUtil.inflate(inflater
                 , R.layout.fragment_book_detail
                 , container
@@ -219,8 +221,9 @@ public class BookDetailFragment extends Fragment {
             case R.id.menu_item_delete_book:
                 mViewModel.deleteBook(getActivity());
                 return true;
+            default:
+                return super.onOptionsItemSelected(item);
         }
-        return super.onOptionsItemSelected(item);
     }
 
     /**

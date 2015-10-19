@@ -35,6 +35,11 @@ public class AuthorListItemViewModel {
             AuthorListItemViewModel.class.getSimpleName();
 
     /**
+     * Author data to be displayed.
+     */
+    private Author mAuthor;
+
+    /**
      * Returns the author's name.
      *
      * @return the author's name.
@@ -42,11 +47,6 @@ public class AuthorListItemViewModel {
     public String getAuthorName() {
         return mAuthor == null ? null : mAuthor.getName();
     }
-
-    /**
-     * Author data to be displayed.
-     */
-    private Author mAuthor;
 
     public Author getAuthor() {
         return mAuthor;

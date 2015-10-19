@@ -10,13 +10,10 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Toast;
-
 
 import com.google.zxing.integration.android.IntentIntegrator;
 import com.google.zxing.integration.android.IntentResult;
 
-import org.apache.commons.lang3.StringUtils;
 import org.parceler.Parcels;
 
 import de.greenrobot.event.EventBus;
@@ -83,19 +80,32 @@ public class BookAdditionFragment extends Fragment {
 
         @Override
         public void afterTextChanged(Editable s) {
-            mViewModel.setIsbn(s != null ? s.toString() : null);
-            if (s != null && s.toString().length() ==
-                    getResources().getInteger(R.integer.isbn13_length)) {
-                if (mViewModel.isValidIsbn(mViewModel.getIsbn())) {
-                    mBinding.isbnEditText.setError(null);
-                    requestBookAddition();
-                } else {
-                    mBinding.isbnEditText.setError(getString(
-                            R.string.msg_invalid_isbn, mViewModel.getIsbn()));
-                }
-            }
+            updateIsbn(s);
         }
     };
+
+    /**
+     * Updates the value of {@link BookAdditionViewModel#mIsbn} with that
+     * passed as argument. This method is called by the {@link TextWatcher}.
+     * If the value is a valid ISBN-13, request the book's addition to the
+     * {@link BookService}.
+     *
+     * @param s the updated value if the ISBN-13 field.
+     * @see BookService
+     */
+    private void updateIsbn(Editable s) {
+        mViewModel.setIsbn(s != null ? s.toString() : null);
+        if (s != null && s.toString().length() ==
+                getResources().getInteger(R.integer.isbn13_length)) {
+            if (mViewModel.isValidIsbn(mViewModel.getIsbn())) {
+                mBinding.isbnEditText.setError(null);
+                requestBookAddition();
+            } else {
+                mBinding.isbnEditText.setError(getString(
+                        R.string.msg_invalid_isbn, mViewModel.getIsbn()));
+            }
+        }
+    }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {

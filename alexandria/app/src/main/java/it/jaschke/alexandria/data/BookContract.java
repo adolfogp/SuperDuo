@@ -11,7 +11,7 @@ import android.provider.BaseColumns;
  * @author Sascha Jaschke
  * @author Jesús Adolfo García Pasquel
  */
-public class BookContract {
+public final class BookContract {
 
     /**
      * Identifies the content provider.
@@ -38,6 +38,13 @@ public class BookContract {
      * Path for the book categories.
      */
     public static final String PATH_BOOK_CATEGORY = "category";
+
+    /**
+     * The class only provides constants and utility methods.
+     */
+    private BookContract() {
+        // Empty constructor
+    }
 
     /**
      * Defines the contents of the table holding book data.

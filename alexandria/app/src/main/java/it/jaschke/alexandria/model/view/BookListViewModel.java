@@ -16,13 +16,9 @@
 
 package it.jaschke.alexandria.model.view;
 
-import android.databinding.BaseObservable;
-import android.databinding.Bindable;
-import android.databinding.adapters.TextViewBindingAdapter;
 import android.net.Uri;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 
@@ -30,7 +26,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.parceler.Parcel;
 
 import de.greenrobot.event.EventBus;
-import it.jaschke.alexandria.BR;
 import it.jaschke.alexandria.data.BookContract;
 import it.jaschke.alexandria.model.domain.Book;
 import it.jaschke.alexandria.model.event.BookSelectionEvent;
@@ -57,7 +52,7 @@ public class BookListViewModel {
      * a book.
      */
     private static final String SELECTION_PARTIAL_TITLE =
-            BookEntry.COLUMN_TITLE +" LIKE ? OR "
+            BookEntry.COLUMN_TITLE + " LIKE ? OR "
             + BookEntry.COLUMN_SUBTITLE + " LIKE ? ";
 
     /**
@@ -71,18 +66,6 @@ public class BookListViewModel {
      * containing this value.
      */
     private String mSearchString;
-
-    /**
-     * Publishes a {@link BookSelectionEvent} on the {@link EventBus}, with a
-     * new instance of {@link Book} with only its id (the ISBN-13) assigned.
-     */
-    private final AdapterView.OnItemClickListener mBookClickListener =
-            (parent, view, position, id) -> {
-                mSelectedPosition = position;
-                Book selectedBook = new Book();
-                selectedBook.setId(id);
-                EventBus.getDefault().post(new BookSelectionEvent(selectedBook));
-            };
 
     /**
      * Updates the value of the search string with the changes entered by
@@ -105,6 +88,23 @@ public class BookListViewModel {
         }
     };
 
+    /**
+     * Updates the value of {@link #mSelectedPosition} and publishes a
+     * {@link BookSelectionEvent} on the {@link EventBus}, containing a new
+     * instance of {@link Book} with only its id (the ISBN-13) assigned.
+     *
+     * @param parent ignored.
+     * @param view ignored.
+     * @param position the book's position in the list.
+     * @param id the book's identifier.
+     */
+    public void onBookSelected(AdapterView<?> parent, View view, int position, long id) {
+        mSelectedPosition = position;
+        Book selectedBook = new Book();
+        selectedBook.setId(id);
+        EventBus.getDefault().post(new BookSelectionEvent(selectedBook));
+    }
+
 
     public int getSelectedPosition() {
         return mSelectedPosition;
@@ -126,6 +126,13 @@ public class BookListViewModel {
         return mSearchString;
     }
 
+    /**
+     * Updates the value of the search string to the one passed. If the new
+     * value is different than the current one, publishes a
+     * {@link SearchStringChangeEvent} on the {@link EventBus}.
+     *
+     * @param searchString the new value of the search string.
+     */
     public void setSearchString(String searchString) {
         if (StringUtils.equals(mSearchString, searchString)) {
             return;
@@ -136,8 +143,13 @@ public class BookListViewModel {
                 new SearchStringChangeEvent(old, mSearchString));
     }
 
+    /**
+     * Returns a reference to {@link #onBookSelected(AdapterView, View, int, long)}.
+     *
+     * @return a reference to {@link #onBookSelected(AdapterView, View, int, long)}
+     */
     public AdapterView.OnItemClickListener getBookClickListener() {
-        return mBookClickListener;
+        return this::onBookSelected;
     }
 
     public TextWatcher getSearchStringWatcher() {
@@ -147,7 +159,7 @@ public class BookListViewModel {
     /**
      * Returns the content {@link Uri} from which the list of books is retrieved.
      *
-     * @returnthe content {@link Uri} from which the list of books is retrieved.
+     * @return the content {@link Uri} from which the list of books is retrieved.
      */
     public Uri getBookListQueryUri() {
         return BookContract.BookEntry.CONTENT_URI;
