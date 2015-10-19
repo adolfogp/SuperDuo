@@ -60,9 +60,7 @@ The applications use the following frameworks and libraries:
       (http://tech.vg.no/2015/07/17/android-databinding-goodbye-presenter-hello-viewmodel/)
     - [Don't forget the View Model!]
       (http://tech.vg.no/2015/04/06/dont-forget-the-view-model/)
-* [Retrofit](http://square.github.io/retrofit/) to consume the RESTful API.
 * [Picasso](http://square.github.io/picasso/) to download, cache and display images.
-* [Dagger 2](http://google.github.io/dagger/) for dependency injection.
 * [Retrolambda](https://github.com/orfjackal/retrolambda) in order to use
   Java 8's lambda syntax.
 * [EventBus](https://github.com/greenrobot/EventBus) to handle communication
