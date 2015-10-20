@@ -5,47 +5,20 @@
     <data class="BookListItemBinding">
     </data>
 
-    <RelativeLayout android:layout_width="match_parent"
-                    android:layout_height="?android:attr/listPreferredItemHeight"
-                    android:padding="6dip">
+    <RelativeLayout style="@style/BookList.Item">
 
         <ImageView
             android:id="@+id/book_cover_image_view"
-            android:layout_width="wrap_content"
-            android:layout_height="fill_parent"
-            android:layout_alignParentBottom="true"
-            android:layout_alignParentTop="true"
-            android:layout_marginRight="6dip"
+            style="@style/BookList.Item.CoverImage"
+            android:layout_alignParentLeft="true"
             android:contentDescription="@string/book_cover"/>
 
         <TextView
             android:id="@+id/book_title_text_view"
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
+            style="@style/BookList.Item.Title"
             android:layout_alignParentRight="true"
-            android:layout_alignParentTop="true"
-            android:layout_alignWithParentIfMissing="true"
-            android:layout_marginRight="10dp"
             android:layout_toRightOf="@id/book_cover_image_view"
-            android:ellipsize="end"
-            android:gravity="center_vertical"
-            android:maxLines="1"
-            android:textSize="16sp"/>
-
-
-        <TextView
-            android:id="@+id/book_subtitle_text_view"
-            android:layout_width="fill_parent"
-            android:layout_height="26dip"
-            android:layout_alignParentBottom="true"
-            android:layout_marginRight="10dp"
-            android:layout_toEndOf="@+id/book_cover_image_view"
-            android:layout_toRightOf="@+id/book_cover_image_view"
-            android:ellipsize="end"
-            android:maxLines="1"
-            android:singleLine="true"
-            android:textSize="12sp"/>
-
+            tools:text="The Title of a Great Book"/>
 
     </RelativeLayout>
 </layout>

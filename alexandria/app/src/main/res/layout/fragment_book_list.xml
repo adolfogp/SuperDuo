@@ -14,14 +14,15 @@
         <ImageButton
             android:id="@+id/search_image_button"
             style="?android:attr/buttonBarButtonStyle"
+            android:layout_marginTop="@dimen/half_activity_vertical_margin"
+            android:layout_marginBottom="@dimen/half_activity_vertical_margin"
+            android:layout_marginRight="@dimen/activity_horizontal_margin"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentEnd="true"
             android:layout_alignParentRight="true"
-            android:layout_alignParentTop="true"
-            android:layout_marginTop="5dp"
             android:contentDescription="@string/search"
-            android:src="@drawable/ic_action_search"/>
+            android:src="@drawable/ic_magnify"/>
 
         <EditText
             android:text="@{viewModel.searchString}"
@@ -29,10 +30,9 @@
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
-            android:layout_marginBottom="10dp"
-            android:layout_marginLeft="10dp"
-            android:layout_marginRight="10dp"
-            android:layout_marginTop="10dp"
+            android:layout_marginTop="@dimen/half_activity_vertical_margin"
+            android:layout_marginBottom="@dimen/half_activity_vertical_margin"
+            android:layout_marginLeft="@dimen/activity_horizontal_margin"
             android:layout_toLeftOf="@+id/search_image_button"
             android:layout_toStartOf="@+id/search_image_button"
             android:inputType="text"

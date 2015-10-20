@@ -22,3 +22,6 @@ available at https://materialdesignicons.com/
 
 ic_barcode.png is based on the CC-BY 4.0 licensed SVG image barcode.svg
 available at https://materialdesignicons.com/
+
+ic_magnify.png is based on the CC-BY 4.0 licensed SVG image barcode.svg
+available at https://materialdesignicons.com/

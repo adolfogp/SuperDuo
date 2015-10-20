@@ -11,6 +11,8 @@ import android.view.ViewGroup;
 
 import com.squareup.picasso.Picasso;
 
+import org.apache.commons.lang3.StringUtils;
+
 import it.jaschke.alexandria.R;
 import it.jaschke.alexandria.data.BookContract;
 import it.jaschke.alexandria.databinding.BookListItemBinding;
@@ -82,8 +84,13 @@ public class BookListAdapter extends CursorAdapter {
     @Override
     public void bindView(View view, Context context, Cursor cursor) {
         BookListItemBinding binding = (BookListItemBinding) view.getTag();
-        binding.bookTitleTextView.setText(cursor.getString(COL_TITLE));
-        binding.bookSubtitleTextView.setText(cursor.getString(COL_SUBTITLE));
+        String title = cursor.getString(COL_TITLE);
+        String subtitle = cursor.getString(COL_SUBTITLE);
+        if (StringUtils.trimToNull(subtitle) != null) {
+            title = context.getString(R.string.title_subtitle_pattern
+                    , title, subtitle);
+        }
+        binding.bookTitleTextView.setText(title);
         Picasso.with(context)
                 .load(cursor.getString(COL_COVER_IMAGE_URL))
                 .into(binding.bookCoverImageView);

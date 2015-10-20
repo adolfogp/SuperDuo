@@ -15,8 +15,7 @@
     <string name="msg_response_processing_error">Unable to process book data</string>
     <string name="search">Search</string>
     <string name="action_share">Share</string>
-    <string name="back_button">go back</string>
     <string name="action_add_book">Add book</string>
     <string name="action_delete_book">Delete book</string>
-    <string name="title_activity_book_list">BookListActivity</string>
+    <string name="title_subtitle_pattern"><xliff:g id="title">%1$s</xliff:g>: <xliff:g id="subtitle">%2$s</xliff:g></string>
 </resources>

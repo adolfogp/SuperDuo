@@ -18,4 +18,5 @@
 <resources>
     <item name="alexandria_orange" type="color">#FF9800</item>
     <item name="alexandria_dark_orange" type="color">#EF6C00</item>
+    <item name="book_list_item_title" type="color">#616161</item>
 </resources>
