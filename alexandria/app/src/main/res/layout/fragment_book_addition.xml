@@ -19,9 +19,8 @@
 
         <EditText
             android:id="@+id/isbn_edit_text"
+            style="@style/SearchEditText"
             android:text="@{viewModel.isbn}"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
             android:layout_alignParentLeft="true"
             android:layout_toLeftOf="@+id/scan_image_button"
             android:hint="@string/input_hint"
@@ -32,8 +31,7 @@
 
         <ImageButton
             android:id="@+id/scan_image_button"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            style="@style/BookList.SearchButton"
             android:layout_alignParentRight="true"
             android:text="@string/scan_button"
             android:src="@drawable/ic_barcode"/>

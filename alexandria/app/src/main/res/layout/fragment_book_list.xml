@@ -13,35 +13,23 @@
 
         <ImageButton
             android:id="@+id/search_image_button"
-            style="?android:attr/buttonBarButtonStyle"
-            android:layout_marginTop="@dimen/half_activity_vertical_margin"
-            android:layout_marginBottom="@dimen/half_activity_vertical_margin"
-            android:layout_marginRight="@dimen/activity_horizontal_margin"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            style="@style/BookList.SearchButton"
             android:layout_alignParentEnd="true"
             android:layout_alignParentRight="true"
             android:contentDescription="@string/search"
             android:src="@drawable/ic_magnify"/>
 
         <EditText
-            android:text="@{viewModel.searchString}"
             android:id="@+id/search_edit_text"
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_horizontal"
-            android:layout_marginTop="@dimen/half_activity_vertical_margin"
-            android:layout_marginBottom="@dimen/half_activity_vertical_margin"
-            android:layout_marginLeft="@dimen/activity_horizontal_margin"
+            style="@style/SearchEditText"
+            android:text="@{viewModel.searchString}"
             android:layout_toLeftOf="@+id/search_image_button"
             android:layout_toStartOf="@+id/search_image_button"
-            android:inputType="text"
-            android:saveEnabled="true"/>
+            android:inputType="text"/>
 
         <ListView
             android:id="@+id/book_list_view"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            style="@style/BookList.List"
             android:layout_alignParentLeft="true"
             android:layout_alignParentRight="true"
             android:layout_alignParentStart="true"
