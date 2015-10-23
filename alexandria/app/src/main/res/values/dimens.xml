@@ -16,9 +16,4 @@
 
     <dimen name="book_list_item_cover_height">40dp</dimen>
 
-    <!-- Font sizes -->
-    <dimen name="title">20sp</dimen>
-    <dimen name="subhead">16sp</dimen>
-    <dimen name="body">14sp</dimen>
-
 </resources>

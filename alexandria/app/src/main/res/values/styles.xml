@@ -36,7 +36,7 @@
         <item name="android:layout_height">wrap_content</item>
         <item name="android:layout_centerInParent">true</item>
         <item name="android:layout_marginRight">@dimen/activity_horizontal_margin</item>
-        <item name="android:textSize">@dimen/subhead</item>
+        <item name="android:textAppearance">@style/TextAppearance.AppCompat.Subhead</item>
         <item name="android:textColor">@color/book_list_item_title</item>
     </style>
 
