@@ -33,6 +33,7 @@
             android:id="@+id/scan_image_button"
             style="@style/BookList.SearchButton"
             android:layout_alignParentRight="true"
+            android:contentDescription="@string/scan_button"
             android:text="@string/scan_button"
             android:src="@drawable/ic_barcode"/>
 
