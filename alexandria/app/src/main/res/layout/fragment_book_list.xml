@@ -27,17 +27,44 @@
             android:layout_toStartOf="@+id/search_image_button"
             android:inputType="text"/>
 
-        <ListView
-            android:id="@+id/book_list_view"
+        <FrameLayout
             style="@style/BookList.List"
             android:layout_alignParentLeft="true"
             android:layout_alignParentRight="true"
             android:layout_alignParentStart="true"
             android:layout_alignRight="@id/search_image_button"
-            android:onItemClickListener="@{viewModel.bookClickListener}"
             android:layout_below="@+id/search_edit_text"
             android:layout_marginLeft="0dp"
-            android:layout_toRightOf="@id/search_image_button"/>
+            android:layout_toRightOf="@id/search_image_button">
+
+            <ListView
+                android:id="@+id/book_list_view"
+                style="@style/BookList.List"
+                android:onItemClickListener="@{viewModel.bookClickListener}"/>
+
+            <RelativeLayout
+                android:id="@+id/book_list_empty_view"
+                style="@style/BookList.List"
+                android:visibility="gone">
+
+                <ImageView
+                    android:id="@+id/book_list_empty_image"
+                    android:layout_width="@dimen/empty_book_list_image_size"
+                    android:layout_height="@dimen/empty_book_list_image_size"
+                    android:layout_centerHorizontal="true"
+                    android:layout_centerVertical="true"
+                    android:src="@drawable/book_list_empty"/>
+
+                <TextView
+                    android:id="@+id/book_list_empty_label"
+                    style="@style/BookList.List.Empty"
+                    android:layout_below="@+id/book_list_empty_image"
+                    android:text="@string/book_list_empty_label"/>
+
+            </RelativeLayout>
+
+
+        </FrameLayout>
 
     </RelativeLayout>
 

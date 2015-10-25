@@ -30,6 +30,8 @@ as part of the third project assignment for [Udacity's Android Developer Nanodeg
 * Renamed member variables, so they are prefixed by 'm' as required by the standard.
 * Removed logic from views (Fragments) and placed it in view models.
 * The list of books is filetered as the user types the search string.
+* Added a view to be shown when the list of books is empty (the ListView's empty
+  view).
 * Only one author was stored/retrieved even if the book had more, like
   [9780131103627](https://www.googleapis.com/books/v1/volumes?q=isbn:9780131103627)
 * All the book's authors are now displayed in the book's detail view.

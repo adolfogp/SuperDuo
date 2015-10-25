@@ -113,6 +113,7 @@ public class BookListFragment extends Fragment implements LoaderManager.LoaderCa
                 , container
                 , false);
         mBinding.setViewModel(mViewModel);
+        mBinding.bookListView.setEmptyView(mBinding.bookListEmptyView);
         mBookListAdapter = new BookListAdapter(getActivity(), null, 0);
         mBinding.bookListView.setAdapter(mBookListAdapter);
         mBinding.searchEditText.addTextChangedListener(

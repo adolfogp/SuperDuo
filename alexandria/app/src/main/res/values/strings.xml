@@ -18,4 +18,5 @@
     <string name="action_add_book">Add book</string>
     <string name="action_delete_book">Delete book</string>
     <string name="title_subtitle_pattern"><xliff:g id="title">%1$s</xliff:g>: <xliff:g id="subtitle">%2$s</xliff:g></string>
+    <string name="book_list_empty_label">Time to add some books!</string>
 </resources>
