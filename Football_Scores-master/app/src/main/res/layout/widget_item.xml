@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/widget_item"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:background="@drawable/list_item"
-    android:elevation="4dp"
-    android:orientation="vertical">
+<LinearLayout android:id="@+id/widget_item"
+              xmlns:android="http://schemas.android.com/apk/res/android"
+              xmlns:tools="http://schemas.android.com/tools"
+              android:layout_width="match_parent"
+              android:layout_height="wrap_content"
+              android:background="@drawable/list_item"
+              android:elevation="4dp"
+              android:orientation="vertical">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -24,7 +24,7 @@
                 android:id="@+id/home_crest"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_gravity="center" />
+                android:layout_gravity="center"/>
 
             <TextView
                 android:id="@+id/home_name"
@@ -32,9 +32,9 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
                 android:gravity="center"
-                android:textSize="@dimen/TeamNames"
                 android:textColor="@color/black"
-                tools:text="Test" />
+                android:textSize="@dimen/TeamNames"
+                tools:text="Test"/>
         </LinearLayout>
 
         <LinearLayout
@@ -50,9 +50,9 @@
                 android:layout_gravity="center"
                 android:layout_weight="1"
                 android:gravity="center"
-                android:textSize="@dimen/Score"
                 android:textColor="@color/black"
-                tools:text="Test" />
+                android:textSize="@dimen/Score"
+                tools:text="Test"/>
 
             <TextView
                 android:id="@+id/data_textview"
@@ -62,7 +62,7 @@
                 android:layout_weight="1"
                 android:gravity="center"
                 android:textColor="@color/black"
-                tools:text="Test" />
+                tools:text="Test"/>
 
         </LinearLayout>
 
@@ -76,7 +76,7 @@
                 android:id="@+id/away_crest"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_gravity="center" />
+                android:layout_gravity="center"/>
 
             <TextView
                 android:id="@+id/away_name"
@@ -84,9 +84,9 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
                 android:gravity="center"
-                android:textSize="@dimen/TeamNames"
                 android:textColor="@color/black"
-                tools:text="Test" />
+                android:textSize="@dimen/TeamNames"
+                tools:text="Test"/>
         </LinearLayout>
     </LinearLayout>
 
