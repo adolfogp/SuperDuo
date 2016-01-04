@@ -11,5 +11,6 @@ issues identified as part of the third project assignment for [Udacity's Android
   conventions. Also changed the name of some variables, but many more do not
   follow Java or Android naming conventions. The project does not follow code
   style guidelines.
+* Added a collection widget.
 * The application uses deprecated classes such as
   `android.support.v7.app.ActionBarActivity` and `android.text.format.Time`.
